@@ -81,12 +81,13 @@ void main()
 	theTools.load();
 	theTools.setOutput( getOutsVector() );
 
-	thePreProcessor.process( "img/12.bmp" );
+	thePreProcessor.process( "img/5.bmp" );
 	std::vector< BlackObject > theBlackObjects = thePreProcessor.getBlackObjects();
 	for( int i = 0; i < theBlackObjects.size(); i++ )
 	{
 		std::cout << theTools.predict( theBlackObjects[ i ] ) << std::endl;
 	}
 
+	system("pause");
 	cvWaitKey( 0 );
 }

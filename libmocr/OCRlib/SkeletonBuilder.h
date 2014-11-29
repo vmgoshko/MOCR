@@ -244,6 +244,9 @@ public:
 				}
 			}
 
+			if (theSkeletonPixelsCount == 0)
+				int a = 0;
+
 			theCharacteristics[ 0 ] /= theWidth;
 			theCharacteristics[ 0 ] /= theSkeletonPixelsCount;
 

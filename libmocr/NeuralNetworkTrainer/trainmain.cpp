@@ -24,7 +24,7 @@ void main()
 	neuralNetTools.setOutput( outChars );
 	for( size_t i = 0 ; i < objects.size(); i++ )
 	{
-		neuralNetTools.addObject( objects[i], i /*/ (objects.size() / 1)*/ );
+		neuralNetTools.addObject( objects[i], i );
 	}
 
 	neuralNetTools.performeTraining();

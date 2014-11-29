@@ -128,9 +128,14 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		j--;
 	}
 
+	if (b.b != h - 1)
+		b.b += 1;
+
+	if (b.r != w - 1)
+		b.r += 1;
+
 	BlackObject obj;
 	obj.object = submat( *m, b );
-		
 	obj.maxX = b.b;
 	obj.minX = b.t;
 	obj.maxY = b.r;
@@ -157,6 +162,8 @@ std::vector<char*>* getOutsVector()
 
 	chars->push_back( "+" );
 	chars->push_back( "-" );
+	chars->push_back( "*" );
+	chars->push_back( "/" );
 	
 	chars->push_back( "a" );
 	chars->push_back( "b" );
@@ -166,7 +173,7 @@ std::vector<char*>* getOutsVector()
 	chars->push_back( "f" );
 	chars->push_back( "g" );
 	chars->push_back( "h" );
-	chars->push_back( "u" );
+	chars->push_back( "i" );
 	chars->push_back( "j" );
 	chars->push_back( "k" );
 	chars->push_back( "l" );
