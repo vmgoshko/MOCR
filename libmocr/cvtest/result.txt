@@ -1,0 +1,1 @@
+\sum_{p=0}^{k}qp-ex+2rp-ex

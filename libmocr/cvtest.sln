@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeuralNetworkTrainer", "NeuralNetworkTrainer\NeuralNetworkTrainer.vcxproj", "{B76B0E6E-441F-4781-B7FD-BB6C83874B1A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B87D2591-5EA1-4613-99D9-E13A66E8C0A8} = {B87D2591-5EA1-4613-99D9-E13A66E8C0A8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OCRlib", "OCRlib\OCRlib.vcxproj", "{B87D2591-5EA1-4613-99D9-E13A66E8C0A8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cvtest", "cvtest\cvtest.vcxproj", "{130154B0-6010-49F4-A495-FF8FA367F2F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B76B0E6E-441F-4781-B7FD-BB6C83874B1A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B76B0E6E-441F-4781-B7FD-BB6C83874B1A}.Debug|Win32.Build.0 = Debug|Win32
+		{B76B0E6E-441F-4781-B7FD-BB6C83874B1A}.Debug|x64.ActiveCfg = Debug|Win32
+		{B76B0E6E-441F-4781-B7FD-BB6C83874B1A}.Release|Win32.ActiveCfg = Release|Win32
+		{B76B0E6E-441F-4781-B7FD-BB6C83874B1A}.Release|Win32.Build.0 = Release|Win32
+		{B76B0E6E-441F-4781-B7FD-BB6C83874B1A}.Release|x64.ActiveCfg = Release|Win32
+		{B87D2591-5EA1-4613-99D9-E13A66E8C0A8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B87D2591-5EA1-4613-99D9-E13A66E8C0A8}.Debug|Win32.Build.0 = Debug|Win32
+		{B87D2591-5EA1-4613-99D9-E13A66E8C0A8}.Debug|x64.ActiveCfg = Debug|Win32
+		{B87D2591-5EA1-4613-99D9-E13A66E8C0A8}.Release|Win32.ActiveCfg = Release|Win32
+		{B87D2591-5EA1-4613-99D9-E13A66E8C0A8}.Release|Win32.Build.0 = Release|Win32
+		{B87D2591-5EA1-4613-99D9-E13A66E8C0A8}.Release|x64.ActiveCfg = Release|Win32
+		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Debug|Win32.Build.0 = Debug|Win32
+		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Debug|x64.ActiveCfg = Debug|x64
+		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Debug|x64.Build.0 = Debug|x64
+		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Release|Win32.ActiveCfg = Release|Win32
+		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Release|Win32.Build.0 = Release|Win32
+		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Release|x64.ActiveCfg = Release|x64
+		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
