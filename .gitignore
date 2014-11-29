@@ -12,3 +12,6 @@ libmocr/Debug
 MathOCR/.idea
 MathOCR/__pycache__
 MathOCR/*.bmp
+*.opensdf
+*.suo
+*.vcxproj
