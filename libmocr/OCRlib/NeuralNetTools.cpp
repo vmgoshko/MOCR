@@ -7,7 +7,7 @@ using namespace std;
 using namespace cv;
 
 NeuralNetTools::NeuralNetTools(void) : 
-	TRAIN_SIZE( 8 ), NETWORK_FILE("nn")
+	TRAIN_SIZE( 12 ), NETWORK_FILE("nn")
 {
 }
 
@@ -33,24 +33,27 @@ void NeuralNetTools::performeTraining( )
 	params.bp_moment_scale = 0.1f;
 	params.term_crit = criteria;
 
-	for(size_t i = 0; i < objects.size(); i++)
-		for(int j = 0; j < TRAIN_SIZE; j++)
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		for (int j = 0; j < TRAIN_SIZE; j++)
 		{
-			float theCharacteristic = objects[ i ]->at( j );
-			inputs.at<float>( i, j ) = theCharacteristic;
+			float theCharacteristic = objects[i]->at(j);
+			inputs.at<float>(i, j) = theCharacteristic;
 		}
+	}
 
-	for(size_t i = 0; i < objectOuts.size(); i++)
-		for( size_t j = 0; j < outChars->size(); j++ )
+	for (size_t i = 0; i < objectOuts.size(); i++)
+	{
+		for (size_t j = 0; j < outChars->size(); j++)
 		{
-			outputs.at<float>( i, j ) = objectOuts[ i ]->at( j );
+			outputs.at<float>(i, j) = objectOuts[i]->at(j);
 		}
+	}
 
-	Mat layers(1, 4, CV_32S);
+	Mat layers( 1, 3, CV_32S );
 	layers.at<int>( 0, 0 ) = TRAIN_SIZE;
-	layers.at<int>( 0, 1 ) = 2 * objects.size();
-	layers.at<int>( 0, 2 ) = objects.size();
-	layers.at<int>( 0, 3 ) = outChars->size();
+	layers.at<int>( 0, 1 ) = objects.size();
+	layers.at<int>( 0, 2 ) = outChars->size();
 
 	net.create(layers, CvANN_MLP::SIGMOID_SYM, 0.6, 1 );
 
@@ -94,13 +97,13 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 	SkeletonBuilder::skeleton( obj.object, obj.object );
 	std::vector< float >* theCharacteristics = new std::vector< float >( SkeletonBuilder::calculateCharacteristic( obj.object, 1 ) );
 
-	Mat two(1, TRAIN_SIZE, CV_32F);
+	Mat two( 1, TRAIN_SIZE, CV_32F );
 	Mat predictOutput( 1, outChars->size(), CV_32F );
-	predictOutput.setTo(0);
+	predictOutput.setTo( 0 );
 	
 	for(int j = 0; j < TRAIN_SIZE; j++)
 	{
-		float theCharacteristic = (float)theCharacteristics->at(j); 
+		float theCharacteristic = (float)theCharacteristics->at(j);
 		two.at<float>( 0, j ) = theCharacteristic;
 	}
 
@@ -116,6 +119,9 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 	int maxI = 0;
 	for( int i = 0; i < predictOutput.cols; i++ )
 		maxI = theResult[ i ] > theResult[ maxI ] ? i : maxI;
+
+	if (maxI == 19)
+		int a = 0;
 
 	//cout << predictOutput << endl;
 	return outChars->at(maxI);
