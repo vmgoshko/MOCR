@@ -13,3 +13,5 @@ libmocr/Debug
 MathOCR/.idea
 MathOCR/__pycache__
 MathOCR/*.bmp
+libmocr/cvtest/nn
+libmocr/NeuralNetworkTrainer/nn
