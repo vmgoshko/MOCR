@@ -7,7 +7,7 @@ using namespace std;
 using namespace cv;
 
 NeuralNetTools::NeuralNetTools(void) : 
-	TRAIN_SIZE(8), NETWORK_FILE("nn")
+	TRAIN_SIZE( 8 ), NETWORK_FILE("nn")
 {
 }
 
@@ -23,14 +23,14 @@ void NeuralNetTools::performeTraining( )
 	Mat outputs( objectOuts.size(), outChars->size(), CV_32F );
 	
 	CvTermCriteria criteria;
-	criteria.max_iter = 500;
+	criteria.max_iter = 1000;
 	criteria.epsilon = 0.001f;
-	criteria.type = CV_TERMCRIT_ITER | CV_TERMCRIT_EPS;
+	criteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
 
 	CvANN_MLP_TrainParams params;
 	params.train_method = CvANN_MLP_TrainParams::BACKPROP;
-	params.bp_dw_scale = 0.05f;
-	params.bp_moment_scale = 0.05f;
+	params.bp_dw_scale = 0.1f;
+	params.bp_moment_scale = 0.1f;
 	params.term_crit = criteria;
 
 	for(size_t i = 0; i < objects.size(); i++)
@@ -46,14 +46,16 @@ void NeuralNetTools::performeTraining( )
 			outputs.at<float>( i, j ) = objectOuts[ i ]->at( j );
 		}
 
-	Mat layers(1,3,CV_32S);
-	layers.at<int>(0,0) = TRAIN_SIZE;
-	layers.at<int>(0,1) = objects.size();
-	layers.at<int>(0,2) = outChars->size();
+	Mat layers(1, 4, CV_32S);
+	layers.at<int>( 0, 0 ) = TRAIN_SIZE;
+	layers.at<int>( 0, 1 ) = 2 * objects.size();
+	layers.at<int>( 0, 2 ) = objects.size();
+	layers.at<int>( 0, 3 ) = outChars->size();
 
-	net.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1 );
+	net.create(layers, CvANN_MLP::SIGMOID_SYM, 0.6, 1 );
 
-	net.train( inputs , outputs , cv::Mat(), cv::Mat(), params );
+	int theIterations = net.train( inputs, outputs, cv::Mat( ), cv::Mat( ), params );
+	cout << "Training complete with " << theIterations << " iterations" << endl;
 	net.save( NETWORK_FILE );
 }
 
@@ -98,7 +100,7 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 	
 	for(int j = 0; j < TRAIN_SIZE; j++)
 	{
-		float theCharacteristic = (float)theCharacteristics->at(j)/* / 255.f*/; 
+		float theCharacteristic = (float)theCharacteristics->at(j); 
 		two.at<float>( 0, j ) = theCharacteristic;
 	}
 
@@ -106,11 +108,14 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 
 	std::vector< float > theResult;
 	for( int i = 0; i < predictOutput.cols; i++ )
-		theResult.push_back( predictOutput.at<float>( 0, i ) );
+	{	
+		float theResultValue = predictOutput.at<float>( 0, i );
+		theResult.push_back( theResultValue > 0 ? theResultValue : 0 );
+	}
 
 	int maxI = 0;
 	for( int i = 0; i < predictOutput.cols; i++ )
-		maxI = predictOutput.at<float>(0,i) > predictOutput.at<float>(0,maxI) ? i : maxI;
+		maxI = theResult[ i ] > theResult[ maxI ] ? i : maxI;
 
 	//cout << predictOutput << endl;
 	return outChars->at(maxI);

@@ -162,7 +162,7 @@ std::vector<char*>* getOutsVector()
 
 	chars->push_back( "+" );
 	chars->push_back( "-" );
-	chars->push_back( "*" );
+	//chars->push_back( "*" );
 	chars->push_back( "/" );
 	
 	chars->push_back( "a" );

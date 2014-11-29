@@ -182,7 +182,11 @@ public:
 		6. Количество скелетных точек, связанных с соседними по вертикали, к общему количеству скелетных точек
 		7. Количество скелетных точек, связанных с соседними по главной диагонали, к общему количеству скелетных точек
 		8. Количество скелетных точек, связанных с соседними по обратной диагонали, к общему количеству скелетных точек
-	
+
+		9. Количество скелетных точек выше центра тяжести по y 
+		10. Количество скелетных точек ниже центра тяжести по y
+		11. Количество скелетных точек левее центра тяжести по x
+		12. Количество скелетных точек правее центра тяжести по x
 	*/
 	static std::vector< float > calculateCharacteristic( cv::Mat& inSkeleton, float inObjectColor )
 	{
@@ -222,12 +226,6 @@ public:
 					theCharacteristics[ 0 ] += j;
 					// Центр тяжести относительно оси OY
 					theCharacteristics[ 1 ] += i;
-					// Среднеквадратичное отклонение от центра тяжести отностиельно OX
-					theCharacteristics[ 2 ] += ( j - theCharacteristics[ 0 ] ) * ( j - theCharacteristics[ 0 ] );
-					// Среднеквадратичное отклонение от центра тяжести отностиельно OY
-					theCharacteristics[ 3 ] += ( i - theCharacteristics[ 1 ] ) * ( i - theCharacteristics[ 1 ] );
-					
-					bool theBorder = (( i == 0 ) || ( j == 0 ) || ( i == theHeight - 1 ) || ( j == theWidth - 1 ));
 					
 					// Количество скелетных точек, связанных с соседними по горизонтали, к общему количеству скелетных точек:
 					if( theLeft == inObjectColor || theRight == inObjectColor )
@@ -244,14 +242,40 @@ public:
 				}
 			}
 
-			if (theSkeletonPixelsCount == 0)
-				int a = 0;
-
-			theCharacteristics[ 0 ] /= theWidth;
 			theCharacteristics[ 0 ] /= theSkeletonPixelsCount;
+			//theCharacteristics[ 0 ] /= theWidth;
 
-			theCharacteristics[ 1 ] /= theHeight;
 			theCharacteristics[ 1 ] /= theSkeletonPixelsCount;
+			//theCharacteristics[ 1 ] /= theHeight;
+
+			theCharacteristics[ 4 ] /= theSkeletonPixelsCount;
+			theCharacteristics[ 5 ] /= theSkeletonPixelsCount;
+			theCharacteristics[ 6 ] /= theSkeletonPixelsCount;
+			theCharacteristics[ 7 ] /= theSkeletonPixelsCount;
+
+			for( int i = 0; i < theHeight; i++ )
+				for( int j = 0; j < theWidth; j++ )
+				{
+					float thePixel = theBoundedSkeleton.at< float >( i, j );
+
+					if( thePixel > 0 )
+					{
+					/*	if( i / (float)theSkeletonPixelsCount < theCharacteristics[ 0 ] )
+							theCharacteristics[ 8 ] += 1;
+						else
+							theCharacteristics[ 9 ] += 1;
+
+						if( j / (float)theSkeletonPixelsCount < theCharacteristics[ 1 ] )
+							theCharacteristics[ 10 ] += 1;
+						else
+							theCharacteristics[ 11 ] += 1;*/
+
+						// Среднеквадратичное отклонение от центра тяжести отностиельно OX
+						theCharacteristics[ 2 ] += ( j - theCharacteristics[ 0 ] ) * ( j - theCharacteristics[ 0 ] );
+						// Среднеквадратичное отклонение от центра тяжести отностиельно OY
+						theCharacteristics[ 3 ] += ( i - theCharacteristics[ 1 ] ) * ( i - theCharacteristics[ 1 ] );
+					}
+				}
 
 			theCharacteristics[ 2 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 2 ] = sqrtf( theCharacteristics[ 2 ] );
@@ -259,14 +283,14 @@ public:
 			theCharacteristics[ 3 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 3 ] = sqrtf( theCharacteristics[ 3 ] );
 
-			theCharacteristics[ 4 ] /= theSkeletonPixelsCount;
-			theCharacteristics[ 5 ] /= theSkeletonPixelsCount;
-			theCharacteristics[ 6 ] /= theSkeletonPixelsCount;
-			theCharacteristics[ 7 ] /= theSkeletonPixelsCount;
-
+				/*
+			theCharacteristics[ 8 ] /= theSkeletonPixelsCount;
+			theCharacteristics[ 9 ] /= theSkeletonPixelsCount;
+			theCharacteristics[ 10 ] /= theSkeletonPixelsCount;
+			theCharacteristics[ 11 ] /= theSkeletonPixelsCount;
+			*/
 			return theCharacteristics;
 	}
-
 };
 
 #endif //SKELETON_BUILDER_H
