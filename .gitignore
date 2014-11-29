@@ -1,0 +1,14 @@
+*.sdf
+*.suo
+*.vcxproj
+*.log
+*.tlog
+*.obj
+*.pdb
+*.idb
+*.exe
+*.ilk
+libmocr/Debug
+MathOCR/.idea
+MathOCR/__pycache__
+MathOCR/*.bmp
