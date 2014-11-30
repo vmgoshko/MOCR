@@ -23,8 +23,8 @@ void NeuralNetTools::performeTraining( )
 	Mat outputs( objectOuts.size(), outChars->size(), CV_32F );
 	
 	CvTermCriteria criteria;
-	criteria.max_iter = 1000;
-	criteria.epsilon = 0.001f;
+//	criteria.max_iter = 1000;
+	criteria.epsilon = 0.00001f;
 	criteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
 
 	CvANN_MLP_TrainParams params;
@@ -81,7 +81,7 @@ void NeuralNetTools::addObject( BlackObject& obj, int outIndex )
 	objects.push_back( theCharacteristics );
 
 	//create output
-	vector<float>* out = new vector<float>( outChars->size( ), 0 );
+	vector<float>* out = new vector<float>( outChars->size( ), -1 );
 	out->at(outIndex) = 1;
 	objectOuts.push_back(out);
 }
@@ -120,7 +120,7 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 	for( int i = 0; i < predictOutput.cols; i++ )
 		maxI = theResult[ i ] > theResult[ maxI ] ? i : maxI;
 
-	if (maxI == 19)
+	if (maxI == 11)
 		int a = 0;
 
 	//cout << predictOutput << endl;

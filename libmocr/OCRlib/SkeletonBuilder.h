@@ -258,16 +258,6 @@ public:
 
 					if( thePixel > 0 )
 					{
-						if( i / (float)theSkeletonPixelsCount < theCharacteristics[ 0 ] )
-							theCharacteristics[ 8 ] += 1;
-						else
-							theCharacteristics[ 9 ] += 1;
-
-						if( j / (float)theSkeletonPixelsCount < theCharacteristics[ 1 ] )
-							theCharacteristics[ 10 ] += 1;
-						else
-							theCharacteristics[ 11 ] += 1;
-
 						// Среднеквадратичное отклонение от центра тяжести отностиельно OX
 						theCharacteristics[ 2 ] += ( j - theCharacteristics[ 0 ] ) * ( j - theCharacteristics[ 0 ] );
 						// Среднеквадратичное отклонение от центра тяжести отностиельно OY
@@ -275,11 +265,30 @@ public:
 					}
 				}
 
+			theCharacteristics[2] /= theSkeletonPixelsCount;
 			theCharacteristics[2] = sqrtf(theCharacteristics[2]);
-			theCharacteristics[ 2 ] /= theSkeletonPixelsCount;
 
-			theCharacteristics[ 3 ] = sqrtf( theCharacteristics[ 3 ] );
 			theCharacteristics[3] /= theSkeletonPixelsCount;
+			theCharacteristics[ 3 ] = sqrtf( theCharacteristics[ 3 ] );
+
+			for (int i = 0; i < theHeight; i++)
+			for (int j = 0; j < theWidth; j++)
+			{
+				float thePixel = theBoundedSkeleton.at< float >(i, j);
+
+				if (thePixel > 0)
+				{
+					if (i < theCharacteristics[0])
+						theCharacteristics[8] += 1;
+					else
+						theCharacteristics[9] += 1;
+
+					if (j < theCharacteristics[1])
+						theCharacteristics[10] += 1;
+					else
+						theCharacteristics[11] += 1;
+				}
+			}
 
 			theCharacteristics[ 8 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 9 ] /= theSkeletonPixelsCount;
