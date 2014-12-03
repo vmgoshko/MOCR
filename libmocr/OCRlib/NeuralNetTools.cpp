@@ -7,7 +7,7 @@ using namespace std;
 using namespace cv;
 
 NeuralNetTools::NeuralNetTools(void) : 
-	TRAIN_SIZE( 12 ), NETWORK_FILE("nn")
+	TRAIN_SIZE( 8 ), NETWORK_FILE("nn")
 {
 }
 
@@ -23,8 +23,8 @@ void NeuralNetTools::performeTraining( )
 	Mat outputs( objectOuts.size(), outChars->size(), CV_32F );
 	
 	CvTermCriteria criteria;
-//	criteria.max_iter = 1000;
-	criteria.epsilon = 0.00001f;
+	//criteria.max_iter = 200;
+	criteria.epsilon = 0.01f;
 	criteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
 
 	CvANN_MLP_TrainParams params;
@@ -55,9 +55,9 @@ void NeuralNetTools::performeTraining( )
 	layers.at<int>( 0, 1 ) = objects.size();
 	layers.at<int>( 0, 2 ) = outChars->size();
 
-	net.create(layers, CvANN_MLP::SIGMOID_SYM, 0.6, 1 );
+	net.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1 );
 
-	int theIterations = net.train( inputs, outputs, cv::Mat( ), cv::Mat( ), params );
+	int theIterations = net.train( inputs, outputs, cv::Mat( ).setTo(-1), cv::Mat( ), params );
 	cout << "Training complete with " << theIterations << " iterations" << endl;
 	net.save( NETWORK_FILE );
 }
@@ -72,11 +72,19 @@ void invert( cv::Mat& inImage )
 		}
 }
 
+void showImage( const char* name, cv::Mat& img )
+{
+	cv::namedWindow( name, CV_WINDOW_AUTOSIZE );
+	cv::imshow( name, img );
+}
+
 void NeuralNetTools::addObject( BlackObject& obj, int outIndex )
 {
 	//create input
 	invert( obj.object );
 	SkeletonBuilder::skeleton( obj.object, obj.object );
+	obj = bound( &obj.object, 1 );
+
 	std::vector< float >* theCharacteristics = new std::vector< float >( SkeletonBuilder::calculateCharacteristic( obj.object, 1 ) );
 	objects.push_back( theCharacteristics );
 
@@ -95,6 +103,7 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 {
 	invert( obj.object );
 	SkeletonBuilder::skeleton( obj.object, obj.object );
+	obj = bound( &obj.object, 1 );
 	std::vector< float >* theCharacteristics = new std::vector< float >( SkeletonBuilder::calculateCharacteristic( obj.object, 1 ) );
 
 	Mat two( 1, TRAIN_SIZE, CV_32F );
@@ -123,6 +132,7 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 	if (maxI == 11)
 		int a = 0;
 
+	delete theCharacteristics;
 	//cout << predictOutput << endl;
 	return outChars->at(maxI);
 }

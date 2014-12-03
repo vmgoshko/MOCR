@@ -201,7 +201,7 @@ public:
 		int theMainDiagonalJoinCount = 0;
 		int theSideDiagonalJoinCount = 0;
 
-		std::vector< float > theCharacteristics( 12, 0 );
+		std::vector< float > theCharacteristics( 8, 0 );
 
 		for( int i = 0; i < theHeight; i++ )
 			for( int j = 0; j < theWidth; j++ )
@@ -243,7 +243,6 @@ public:
 			}
 
 			theCharacteristics[ 0 ] /= theSkeletonPixelsCount;
-
 			theCharacteristics[ 1 ] /= theSkeletonPixelsCount;
 
 			theCharacteristics[ 4 ] /= theSkeletonPixelsCount;
@@ -265,36 +264,38 @@ public:
 					}
 				}
 
-			theCharacteristics[2] /= theSkeletonPixelsCount;
-			theCharacteristics[2] = sqrtf(theCharacteristics[2]);
+			theCharacteristics[ 2 ] = sqrtf( theCharacteristics[ 2 ] );
+			theCharacteristics[ 2 ] /= theSkeletonPixelsCount;
+			theCharacteristics[ 2 ] /= theWidth;
 
-			theCharacteristics[3] /= theSkeletonPixelsCount;
 			theCharacteristics[ 3 ] = sqrtf( theCharacteristics[ 3 ] );
-
+			theCharacteristics[ 3 ] /= theSkeletonPixelsCount;
+			theCharacteristics[ 3 ] /= theHeight;
+			/*
 			for (int i = 0; i < theHeight; i++)
-			for (int j = 0; j < theWidth; j++)
-			{
-				float thePixel = theBoundedSkeleton.at< float >(i, j);
-
-				if (thePixel > 0)
+				for (int j = 0; j < theWidth; j++)
 				{
-					if (i < theCharacteristics[0])
-						theCharacteristics[8] += 1;
-					else
-						theCharacteristics[9] += 1;
+					float thePixel = theBoundedSkeleton.at< float >(i, j);
 
-					if (j < theCharacteristics[1])
-						theCharacteristics[10] += 1;
-					else
-						theCharacteristics[11] += 1;
+					if (thePixel > 0)
+					{
+						if (i < theCharacteristics[0])
+							theCharacteristics[8] += 1;
+						else
+							theCharacteristics[9] += 1;
+
+						if (j < theCharacteristics[1])
+							theCharacteristics[10] += 1;
+						else
+							theCharacteristics[11] += 1;
+					}
 				}
-			}
 
 			theCharacteristics[ 8 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 9 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 10 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 11 ] /= theSkeletonPixelsCount;
-
+			*/
 			theCharacteristics[0] /= theWidth;
 			theCharacteristics[1] /= theHeight;
 			

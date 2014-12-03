@@ -18,7 +18,7 @@ void main()
 	ImagePreProccessor preProcessor;
 	vector<char*>* outChars = getOutsVector();
 
-	cv::Mat image = preProcessor.process( "img/traindata.bmp" );
+	cv::Mat image = preProcessor.process( "img/traindata_small.bmp" );
 	vector< BlackObject > objects = preProcessor.getBlackObjects();
 	
 	neuralNetTools.setOutput( outChars );
@@ -31,5 +31,6 @@ void main()
 	neuralNetTools.save("../cvtest/nn");
 
 	cvWaitKey();
+	system( "pause" );
 	delete outChars;
 }
