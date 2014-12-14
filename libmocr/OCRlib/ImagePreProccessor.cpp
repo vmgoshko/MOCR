@@ -1,6 +1,5 @@
 #include "ImagePreProccessor.h"
-#include "GaussianBlurFilter.h"
-#include "ThresholdFilter.h"
+#include "Filters.h"
 #include <queue>
 
 using namespace cv;
@@ -55,7 +54,7 @@ BlackObject ImagePreProccessor::extractObject( int i, int j )
 				if( k == pt.x && l == pt.y )
 					continue;
 
-				if( !img.at<byte>( k, l ) && !checkArray[k][l] ) 
+				if( !img.at<char>( k, l ) && !checkArray[k][l] ) 
 				{
 					blackPixels.push( Point2i( k, l ) );
 					checkArray[k][l] = true;
@@ -75,7 +74,7 @@ BlackObject ImagePreProccessor::extractObject( int i, int j )
 	{
 		Point2i px = resultPixels.front();
 		resultPixels.pop();
-		res.object.at<byte>(px.x - res.minX, px.y - res.minY) = 0;
+		res.object.at<char>(px.x - res.minX, px.y - res.minY) = 0;
 	}
 		
 	return res;
@@ -89,7 +88,7 @@ void ImagePreProccessor::findBlackObjects()
 	for(int j = 1; j < w - 1; j++)
 		for(int i = 1; i < h - 1; i++)
 		{
-			if( img.at< byte >(i,j) == 0 && !checkArray[i][j] )
+			if (img.at< char >(i, j) == 0 && !checkArray[i][j])
 			{
 				BlackObject obj = extractObject( i, j );
 				
@@ -101,27 +100,24 @@ void ImagePreProccessor::findBlackObjects()
 
 cv::Mat ImagePreProccessor::process( const char* path, bool doFiltering )
 {
-	Filter* theGaussianBlur = new GaussianBlurFilter();
-	Filter* theThresholdFilter = new ThresholdFilter();
+	GaussianBlurFilter theGaussianBlur; 
+	ThresholdFilter theThresholdFilter;
 
 	img = imread(path , IMREAD_GRAYSCALE);
 
 	if( doFiltering )
 	{
-		theGaussianBlur->init( &img );
-		theGaussianBlur->doFilter();
-		theThresholdFilter->init( theGaussianBlur->getImage() );
-		theThresholdFilter->doFilter();
-		img = *theThresholdFilter->getImage();
+		theGaussianBlur.init( &img );
+		theGaussianBlur.doFilter();
+		theThresholdFilter.init( theGaussianBlur.getImage() );
+		theThresholdFilter.doFilter();
+		img = *theThresholdFilter.getImage();
 	}
 	
 	for(int i = 0; i < img.rows; i++ )
 	{
 		checkArray.push_back( vector<bool>(img.cols, false) );
 	}
-
-	delete theGaussianBlur;
-	delete theThresholdFilter;
 
 	return img;
 }

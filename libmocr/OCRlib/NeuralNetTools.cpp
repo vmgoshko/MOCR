@@ -14,6 +14,11 @@ NeuralNetTools::NeuralNetTools(void) :
 
 NeuralNetTools::~NeuralNetTools(void)
 {
+	for (auto theObject : objects)
+		delete theObject;
+
+	for (auto theObjectOut : objectOuts)
+		delete theObjectOut;
 }
 
 
@@ -24,7 +29,7 @@ void NeuralNetTools::performeTraining( )
 	
 	CvTermCriteria criteria;
 	//criteria.max_iter = 200;
-	criteria.epsilon = 0.01f;
+	criteria.epsilon = 0.00001f;
 	criteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
 
 	CvANN_MLP_TrainParams params;
@@ -57,7 +62,7 @@ void NeuralNetTools::performeTraining( )
 
 	net.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1 );
 
-	int theIterations = net.train( inputs, outputs, cv::Mat( ).setTo(-1), cv::Mat( ), params );
+	int theIterations = net.train( inputs, outputs, cv::Mat( ), cv::Mat( ), params );
 	cout << "Training complete with " << theIterations << " iterations" << endl;
 	net.save( NETWORK_FILE );
 }
@@ -80,6 +85,8 @@ void showImage( const char* name, cv::Mat& img )
 
 void NeuralNetTools::addObject( BlackObject& obj, int outIndex )
 {
+	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
+
 	//create input
 	invert( obj.object );
 	SkeletonBuilder::skeleton( obj.object, obj.object );
@@ -101,6 +108,8 @@ void NeuralNetTools::setOutput( vector<char*>* outs )
 
 const char* NeuralNetTools::predict(BlackObject& obj)
 {
+	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
+
 	invert( obj.object );
 	SkeletonBuilder::skeleton( obj.object, obj.object );
 	obj = bound( &obj.object, 1 );
@@ -122,7 +131,7 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 	for( int i = 0; i < predictOutput.cols; i++ )
 	{	
 		float theResultValue = predictOutput.at<float>( 0, i );
-		theResult.push_back( theResultValue > 0 ? theResultValue : 0 );
+		theResult.push_back( theResultValue + 1.5f/*> 0 ? theResultValue : 0 */);
 	}
 
 	int maxI = 0;
@@ -133,7 +142,6 @@ const char* NeuralNetTools::predict(BlackObject& obj)
 		int a = 0;
 
 	delete theCharacteristics;
-	//cout << predictOutput << endl;
 	return outChars->at(maxI);
 }
 

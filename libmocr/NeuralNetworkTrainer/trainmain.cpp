@@ -18,7 +18,7 @@ void main()
 	ImagePreProccessor preProcessor;
 	vector<char*>* outChars = getOutsVector();
 
-	cv::Mat image = preProcessor.process( "img/traindata_small.bmp" );
+	cv::Mat image = preProcessor.process( "img/traindata.bmp" );
 	vector< BlackObject > objects = preProcessor.getBlackObjects();
 	
 	neuralNetTools.setOutput( outChars );

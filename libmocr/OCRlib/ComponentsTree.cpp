@@ -52,7 +52,6 @@ bool isVBL( Mat& m, int x, const Bound& bound )
 	for( int i = bound.t; i < bound.b; i++ )
 	{
 		float px = m.at< float >( i, x );
-		//m.at< byte >( i, x ) = 0;
 		if ( px > 0 )
 			return false;
 	}
@@ -66,7 +65,6 @@ bool isHBL( Mat& m, int y, const Bound& bound )
 	for( int i = bound.l; i < bound.r; i++ )
 	{
 		float px = m.at<float>( y, i );
-		//m.at< byte >( y, i ) = 50;
 		if ( px > 0 )
 			return false;
 	}

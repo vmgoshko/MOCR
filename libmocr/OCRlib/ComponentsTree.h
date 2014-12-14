@@ -27,6 +27,8 @@ public:
 	Bound getBound() const { return bound; }
 	const Component* getParent() { return parent; }
 	std::vector< Component >* getChildren() { return children; }
+
+	
 };
 
 class ComponentsTree 

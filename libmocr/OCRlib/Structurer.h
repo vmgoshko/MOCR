@@ -393,13 +393,13 @@ private:
 
 	bool isSuperscript( BlackObject& curr, BlackObject& next )
 	{
-		int shift = ( curr.maxX - curr.minX ) * 0.3f;
+		int shift = floor( ( curr.maxX - curr.minX ) * 0.3f );
 		return next.maxX < curr.maxX - shift && next.maxX > curr.minX && next.minX < curr.minX;
 	}
 
 	bool isSubscript( BlackObject& curr, BlackObject& next )
 	{
-		int shift = ( curr.maxX - curr.minX ) * 0.3f;
+		int shift = floor( ( curr.maxX - curr.minX ) * 0.3f );
 		return next.minX > curr.minX + shift && next.minX < curr.maxX && next.maxX > curr.maxX;
 	}
 
@@ -410,7 +410,7 @@ private:
 	*/
 	bool isUnder( BlackObject& curr, BlackObject& next )
 	{
-		int delta = (curr.maxY - curr.minY) * 0.1;
+		int delta = floor( (curr.maxY - curr.minY) * 0.1f );
 		return ( next.maxY < curr.maxY + delta ) && ( next.minY > curr.minY - delta ) &&
 			( next.maxX < curr.minX );
 	}
@@ -422,7 +422,7 @@ private:
 	*/
 	bool isBelow( BlackObject& curr, BlackObject& next )
 	{
-		int delta = (curr.maxY - curr.minY) * 0.1;
+		int delta = floor( (curr.maxY - curr.minY) * 0.1f );
 		return ( next.maxY < curr.maxY + delta ) && ( next.minY > curr.minY - delta ) &&
 			( next.minX > curr.maxX );
 	}

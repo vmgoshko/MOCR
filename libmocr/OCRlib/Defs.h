@@ -3,8 +3,10 @@
 
 #include <opencv\cv.h>
 
-typedef unsigned char byte;
-
+namespace Config
+{
+	const int cNeuralNetworkImageHeight = 100;
+}
 
 struct Bound 
 {

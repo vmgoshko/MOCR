@@ -161,7 +161,7 @@ std::vector<char*>* getOutsVector()
 	chars->push_back( ")" );
 
 	chars->push_back( "+" );
-	//chars->push_back( "-" );
+	chars->push_back( "-" );
 	//chars->push_back( "*" );
 	chars->push_back( "/" );
 	
@@ -207,4 +207,11 @@ void trim( std::string& str )
 		}
 		str.erase( j );
 	}
+}
+
+void scaleToHeight(cv::Mat& inImage, int inHeight)
+{
+	float theScaleFactor = (float)inHeight / inImage.rows;
+
+	cv::resize(inImage, inImage, cv::Size(inImage.cols * theScaleFactor, inImage.rows * theScaleFactor));
 }
