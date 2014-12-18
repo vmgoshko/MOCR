@@ -4,6 +4,10 @@
 #include <fstream>
 #include <iostream>
 
+//opencv includes
+#include <opencv2/core/core.hpp>
+#include <opencv/cv.h>
+
 // Should be optimized somehow
 cv::Mat submat( cv::Mat m, Bound b )
 {
@@ -13,6 +17,9 @@ cv::Mat submat( cv::Mat m, Bound b )
 
 	for( int i = 0; i < h; i++ )
 		for( int j = 0; j < w; j++ )
+		if (res.type() == CV_8UC1)
+			res.at<unsigned char>(i, j) = m.at<unsigned char>(i + b.t, j + b.l);
+		else
 			res.at<float>( i, j ) = m.at<float>( i + b.t, j + b.l );
 
 	return res;
@@ -49,7 +56,12 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		j = 0;
 		while( j < w && !isFound )
 		{
-			float px = m->at<float>( i, j );
+			float px = -1;
+			if (m->type() == CV_8UC1)
+				px = m->at<unsigned char>(i, j);
+			else if (m->type() == CV_32FC1)
+				px = m->at<float>( i, j );
+
 			if( px == inObjectColor && b.t == -1 )
 			{
 				b.t = i;
@@ -72,7 +84,13 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		j = 0;
 		while( j < w && !isFound )
 		{
-			if( m->at<float>( i, j ) == inObjectColor )
+			float px = -1;
+			if (m->type() == CV_8UC1)
+				px = m->at<unsigned char>(i, j);
+			else if (m->type() == CV_32FC1)
+				px = m->at<float>(i, j);
+
+			if( px == inObjectColor )
 			{
 				b.b = i;
 				isFound = true;
@@ -94,7 +112,13 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		i = 0;
 		while( i < h && !isFound )
 		{
-			if( m->at<float>( i, j ) == inObjectColor )
+			float px = -1;
+			if (m->type() == CV_8UC1)
+				px = m->at<unsigned char>(i, j);
+			else if (m->type() == CV_32FC1)
+				px = m->at<float>(i, j);
+
+			if( px == inObjectColor )
 			{
 				b.l = j;
 				isFound = true;
@@ -116,7 +140,13 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		i = 0;
 		while( i < h && !isFound )
 		{
-			if( m->at<float>( i, j ) == inObjectColor )
+			float px = -1;
+			if (m->type() == CV_8UC1)
+				px = m->at<unsigned char>(i, j);
+			else if (m->type() == CV_32FC1)
+				px = m->at<float>(i, j);
+
+			if( px == inObjectColor )
 			{
 				b.r = j;
 				isFound = true;
@@ -161,7 +191,7 @@ std::vector<char*>* getOutsVector()
 	chars->push_back( ")" );
 
 	chars->push_back( "+" );
-	chars->push_back( "-" );
+	//chars->push_back( "-" );
 	//chars->push_back( "*" );
 	chars->push_back( "/" );
 	

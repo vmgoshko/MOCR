@@ -226,18 +226,18 @@ public:
 					theCharacteristics[ 0 ] += j;
 					// Центр тяжести относительно оси OY
 					theCharacteristics[ 1 ] += i;
-					
+					 
 					// Количество скелетных точек, связанных с соседними по горизонтали, к общему количеству скелетных точек:
-					if( theLeft == inObjectColor || theRight == inObjectColor )
+					if (theLeft == inObjectColor || theRight == inObjectColor)
 						theCharacteristics[ 4 ] += 1;
-					// Количество скелетных точек, связанных с соседними по вертикали, к общему количеству скелетных точек:
-					if( theTop == inObjectColor || theBottom == inObjectColor )
+						// Количество скелетных точек, связанных с соседними по вертикали, к общему количеству скелетных точек:
+					/*else*/ if (theTop == inObjectColor || theBottom == inObjectColor)
 						theCharacteristics[ 5 ] += 1;
 					// Количество скелетных точек, связанных с соседними по главной диагонали, к общему количеству скелетных точек:
-					if( theTopLeft == inObjectColor || theBottomRight == inObjectColor )
+					/*else*/ if( theTopLeft == inObjectColor || theBottomRight == inObjectColor )
 						theCharacteristics[ 6 ] += 1;
 					// Количество скелетных точек, связанных с соседними по обратной диагонали, к общему количеству скелетных точек:
-					if( theTopRight == inObjectColor || theBottomLeft == inObjectColor )
+					/*else*/ if( theTopRight == inObjectColor || theBottomLeft == inObjectColor )
 						theCharacteristics[ 7 ] += 1;
 				}
 			}
@@ -271,33 +271,9 @@ public:
 			theCharacteristics[ 3 ] = sqrtf( theCharacteristics[ 3 ] );
 			theCharacteristics[ 3 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 3 ] /= theHeight;
-			/*
-			for (int i = 0; i < theHeight; i++)
-				for (int j = 0; j < theWidth; j++)
-				{
-					float thePixel = theBoundedSkeleton.at< float >(i, j);
-
-					if (thePixel > 0)
-					{
-						if (i < theCharacteristics[0])
-							theCharacteristics[8] += 1;
-						else
-							theCharacteristics[9] += 1;
-
-						if (j < theCharacteristics[1])
-							theCharacteristics[10] += 1;
-						else
-							theCharacteristics[11] += 1;
-					}
-				}
-
-			theCharacteristics[ 8 ] /= theSkeletonPixelsCount;
-			theCharacteristics[ 9 ] /= theSkeletonPixelsCount;
-			theCharacteristics[ 10 ] /= theSkeletonPixelsCount;
-			theCharacteristics[ 11 ] /= theSkeletonPixelsCount;
-			*/
-			theCharacteristics[0] /= theWidth;
-			theCharacteristics[1] /= theHeight;
+		
+			theCharacteristics[ 0 ] /= theWidth;
+			theCharacteristics[ 1 ] /= theHeight;
 			
 			return theCharacteristics;
 	}

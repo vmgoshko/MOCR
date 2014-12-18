@@ -23,8 +23,8 @@ public:
 		// Equals
 		for( int i = 0; i < leafs.size() - 1; i++ )
 		{
-			BlackObject curr = bound( &submat( img, leafs[ i ].getBound( ) ), 255 );
-			BlackObject next = bound( &submat( img, leafs[ i + 1 ].getBound( ) ), 255 );
+			BlackObject curr = bound( &submat( img, leafs[ i ].getBound( ) ), 0 );
+			BlackObject next = bound( &submat( img, leafs[ i + 1 ].getBound( ) ), 0 );
 			shiftBounds( curr, next, leafs, i );
 
 			if( strs[i] == "-" && strs[i+1] == "-" )
@@ -56,11 +56,11 @@ public:
 				std::vector< Component > underSumLeafs;
 				std::vector< std::string > underSumStrs;
 				
-				BlackObject sum = bound( &submat( img, leafs[ i ].getBound( ) ), 255 );
+				BlackObject sum = bound( &submat( img, leafs[ i ].getBound( ) ), 0 );
 				shiftBounds( sum, BlackObject(), leafs, i );
 
 				int j = i - 1;
-				BlackObject prev = bound( &submat( img, leafs[ j ].getBound( ) ), 255 );
+				BlackObject prev = bound( &submat( img, leafs[ j ].getBound( ) ), 0 );
 				shiftBounds( prev, BlackObject(), leafs, j );
 
 				int minX = img.rows;
@@ -76,7 +76,7 @@ public:
 					
 					if( j >= 0 )
 					{
-						prev = bound( &submat( img, leafs[ j ].getBound( ) ), 255 );
+						prev = bound( &submat( img, leafs[ j ].getBound( ) ), 0 );
 						shiftBounds( prev, BlackObject(), leafs, j );
 					}
 				}
@@ -93,7 +93,7 @@ public:
 				std::vector< std::string > belowSumStrs;
 				
 				j = i + 1;
-				BlackObject next = bound( &submat( img, leafs[ j ].getBound( ) ), 255 );
+				BlackObject next = bound( &submat( img, leafs[ j ].getBound( ) ), 0 );
 				shiftBounds( next, BlackObject(), leafs, j );
 
 				int maxX = 0;
@@ -109,7 +109,7 @@ public:
 					
 					if( j < leafs.size() )
 					{
-						next = bound( &submat( img, leafs[ j ].getBound( ) ), 255 );
+						next = bound( &submat( img, leafs[ j ].getBound( ) ), 0 );
 						shiftBounds( next, BlackObject(), leafs, j );
 					}
 				}
@@ -158,11 +158,11 @@ public:
 				std::vector< Component > underFracLeafs;
 				std::vector< std::string > underFracStrs;
 				
-				BlackObject fractal = bound( &submat( img, leafs[ i ].getBound( ) ), 255 );
+				BlackObject fractal = bound( &submat( img, leafs[ i ].getBound( ) ), 0 );
 				shiftBounds( fractal, BlackObject(), leafs, i );
 
 				int j = i - 1;
-				BlackObject prev = bound( &submat( img, leafs[ j ].getBound( ) ), 255 );
+				BlackObject prev = bound( &submat( img, leafs[ j ].getBound( ) ), 0 );
 				shiftBounds( prev, BlackObject(), leafs, j );
 
 				int minX = img.rows;
@@ -178,7 +178,7 @@ public:
 					
 					if( j >= 0 )
 					{
-						prev = bound( &submat( img, leafs[ j ].getBound( ) ), 255 );
+						prev = bound( &submat( img, leafs[ j ].getBound( ) ), 0 );
 						shiftBounds( prev, BlackObject(), leafs, j );
 					}
 				}
@@ -195,7 +195,7 @@ public:
 				std::vector< std::string > belowFracStrs;
 				
 				j = i + 1;
-				BlackObject next = bound( &submat( img, leafs[ j ].getBound( ) ), 255 );
+				BlackObject next = bound( &submat( img, leafs[ j ].getBound( ) ), 0 );
 				shiftBounds( next, BlackObject(), leafs, j );
 
 				int maxX = 0;
@@ -211,7 +211,7 @@ public:
 					
 					if( j < leafs.size() )
 					{
-						next = bound( &submat( img, leafs[ j ].getBound( ) ), 255 );
+						next = bound( &submat( img, leafs[ j ].getBound( ) ), 0 );
 						shiftBounds( next, BlackObject(), leafs, j );
 					}
 				}
@@ -323,13 +323,13 @@ public:
 
 		std::vector< BlackObject > row;
 
-		BlackObject curr = bound( &submat( img, leafs[ i ].getBound( ) ), 255 );
+		BlackObject curr = bound( &submat( img, leafs[ i ].getBound( ) ), 0 );
 		shiftBounds( curr, BlackObject(), leafs, i );
 		row.push_back( curr );
 		
 		BlackObject next;
 		if ( i + 1 < strs.size() )
-			next = bound( &submat( img, leafs[ i + 1 ].getBound( ) ), 255 );
+			next = bound( &submat( img, leafs[ i + 1 ].getBound( ) ), 0 );
 		else
 		{
 			i += 1;
@@ -347,8 +347,8 @@ public:
 			{
 				row.push_back( next );
 				isRow( curr, next );
-				curr = bound( &submat( img, leafs[ i ].getBound( ) ), 255 );
-				next = bound( &submat( img, leafs[ i + 1 ].getBound( ) ), 255 );
+				curr = bound( &submat( img, leafs[ i ].getBound( ) ), 0 );
+				next = bound( &submat( img, leafs[ i + 1 ].getBound( ) ), 0 );
 				shiftBounds( curr, next, leafs, i );
 				i += 1;
 			} 

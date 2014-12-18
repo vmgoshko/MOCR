@@ -14,11 +14,12 @@ NeuralNetTools::NeuralNetTools(void) :
 
 NeuralNetTools::~NeuralNetTools(void)
 {
-	for (auto theObject : objects)
-		delete theObject;
+	for (int i = 0; i < objects.size(); i++)
+		delete objects[i];
+	
+	for (int i = 0; i < objectOuts.size(); i++)
+		delete objectOuts[i];
 
-	for (auto theObjectOut : objectOuts)
-		delete theObjectOut;
 }
 
 
@@ -85,6 +86,7 @@ void showImage( const char* name, cv::Mat& img )
 
 void NeuralNetTools::addObject( BlackObject& obj, int outIndex )
 {
+	obj = bound(&obj.object, 0);
 	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
 
 	//create input
@@ -108,6 +110,8 @@ void NeuralNetTools::setOutput( vector<char*>* outs )
 
 const char* NeuralNetTools::predict(BlackObject& obj)
 {
+	obj = bound(&obj.object, 0);
+
 	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
 
 	invert( obj.object );

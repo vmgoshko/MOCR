@@ -47,12 +47,18 @@ void Component::setChildren( std::vector< Component >* children )
 }
 
 //Is vertical black line
-bool isVBL( Mat& m, int x, const Bound& bound )
+bool isVWL( Mat& m, int x, const Bound& bound )
 {
 	for( int i = bound.t; i < bound.b; i++ )
 	{
-		float px = m.at< float >( i, x );
-		if ( px > 0 )
+		float px = -1;
+
+		if (m.type() == CV_8UC1)
+			px = m.at<unsigned char>(i, x);
+		else if (m.type() == CV_32FC1)
+			px = m.at<float>(i, x);
+
+		if (px == 0)
 			return false;
 	}
 
@@ -60,12 +66,17 @@ bool isVBL( Mat& m, int x, const Bound& bound )
 }
 
 //Is horizontal black line
-bool isHBL( Mat& m, int y, const Bound& bound )
+bool isHWL( Mat& m, int y, const Bound& bound )
 {
 	for( int i = bound.l; i < bound.r; i++ )
 	{
-		float px = m.at<float>( y, i );
-		if ( px > 0 )
+		float px = -1;
+		if (m.type() == CV_8UC1)
+			px = m.at<unsigned char>(y, i);
+		else if (m.type() == CV_32FC1)
+			px = m.at<float>(y, i);
+
+		if ( px == 0 )
 			return false;
 	}
 
@@ -88,10 +99,10 @@ vector<Component>* VCE( Mat& m, const Bound& bound, Component* parent )
 
 	while( x < bound.r )
 	{
-		bool theVWL = isVBL( m, x, bound );
+		bool theVWL = isVWL( m, x, bound );
 
 		// the last pixel column is scanning
-		bool theNextVWL =  x < bound.r - 1 ? isVBL( m, x + 1, bound ) : true;
+		bool theNextVWL = x < bound.r - 1 ? isVWL(m, x + 1, bound) : true;
 
 		if( !theNextVWL && theVWL && currentStart == -1 )
 		{
@@ -136,10 +147,10 @@ vector<Component>* HCE( Mat& m, const Bound& bound, Component* parent  )
 
 	while( y < bound.b )
 	{
-		bool theHWL = isHBL( m, y, bound );
+		bool theHWL = isHWL( m, y, bound );
 
 		// the last pixel column is scanning
-		bool theNextHWL =  y < bound.b - 1 ? isHBL( m, y + 1, bound ) : true;
+		bool theNextHWL =  y < bound.b - 1 ? isHWL( m, y + 1, bound ) : true;
 
 		if( !theNextHWL && ( theHWL && currentStart == -1 ) )
 		{

@@ -43,7 +43,10 @@ std::vector<std::string> NeuralNetworkLeafRecognizer::recognizeLeafs( Components
 
 std::string NeuralNetworkLeafRecognizer::recognizeLeaf( cv::Mat* leaf )
 {
+	BlackObject theObject;
+	theObject.object = *leaf;
+
 	// Custom neural network prediction
-	const char* pr = tools->predict( bound( leaf, 255 ) );
+	const char* pr = tools->predict(theObject);
 	return std::string( pr );
 }
