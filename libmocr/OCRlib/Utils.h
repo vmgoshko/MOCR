@@ -21,4 +21,6 @@ std::vector<char*>* getOutsVector();
 void trim( std::string& str );
 
 void scaleToHeight(cv::Mat& inImage, int inHeight);
+
+void invert(cv::Mat& inImage);
 #endif //UTILS_H

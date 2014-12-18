@@ -245,3 +245,13 @@ void scaleToHeight(cv::Mat& inImage, int inHeight)
 
 	cv::resize(inImage, inImage, cv::Size(inImage.cols * theScaleFactor, inImage.rows * theScaleFactor));
 }
+
+void invert(cv::Mat& inImage)
+{
+	for (int i = 0; i < inImage.rows; i++)
+	for (int j = 0; j < inImage.cols; j++)
+	{
+		unsigned char newColor = ~inImage.at< unsigned char >(i, j);
+		inImage.at< unsigned char >(i, j) = newColor;
+	}
+}

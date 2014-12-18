@@ -11,6 +11,7 @@
 #include "NeuralNetworkLeafRecognizer.h"
 #include "Structurer.h"
 #include "SkeletonBuilder.h"
+#include "Utils.h"
 
 
 #include <opencv2/core/core.hpp>
@@ -38,15 +39,7 @@ public:
 	NativeRecognizer( const char* inImagePath )
 		: mImgPath( inImagePath ) {};
 
-	void invert( cv::Mat& inImage )
-	{
-		for( int i = 0; i < inImage.rows; i++ )
-			for( int j = 0; j < inImage.cols; j++ )
-			{
-				unsigned char newColor = 255 - inImage.at< unsigned char >( i, j );
-				inImage.at< unsigned char >( i, j ) = newColor;
-			}
-	}
+
 
 	std::string recognize()
 	{
