@@ -255,3 +255,24 @@ void invert(cv::Mat& inImage)
 		inImage.at< unsigned char >(i, j) = newColor;
 	}
 }
+
+LessAverageToNullFunctor::LessAverageToNullFunctor(float inAverage) 
+	: average(inAverage)
+{
+};
+
+void LessAverageToNullFunctor::operator()(float& element)
+{
+	if (element < average)
+		element = 0;
+}
+
+AddForEach::AddForEach(float inOffset)
+	: offset(inOffset)
+{
+
+}
+void AddForEach::operator()(float& element)
+{
+	element += offset;
+}

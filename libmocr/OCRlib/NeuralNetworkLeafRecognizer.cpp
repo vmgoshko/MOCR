@@ -8,13 +8,13 @@
 //OCRlib includes
 #include "Utils.h"
 #include "ComponentsTree.h"
-#include "NeuralNetTools.h"
+#include "NeuralNetworkTools.h"
 #include "ImagePreProccessor.h"
 
 NeuralNetworkLeafRecognizer::NeuralNetworkLeafRecognizer()
 {
 	// Custom neural network prediction
-	tools = new NeuralNetTools();
+	tools = new NeuralNetworkTools();
 	tools->setOutput( getOutsVector() );
 	tools->load();
 }

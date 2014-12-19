@@ -5,7 +5,7 @@
 #include "LeafRecognizer.h"
 
 class ComponentsTree;
-class NeuralNetTools;
+class NeuralNetworkTools;
 namespace cv
 {
 	class Mat;
@@ -29,7 +29,7 @@ private:
 	std::string recognizeLeaf( Bound bound );
 private:
 	tesseract::TessBaseAPI* mApi;
-	NeuralNetTools* tools;
+	NeuralNetworkTools* tools;
 };
 */
 

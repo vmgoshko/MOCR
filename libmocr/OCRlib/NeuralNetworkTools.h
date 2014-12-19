@@ -5,11 +5,11 @@
 #include "Defs.h"
 #include <opencv2\ml\ml.hpp>
 
-class NeuralNetTools
+class NeuralNetworkTools
 {
 public:
-	NeuralNetTools();
-	~NeuralNetTools();
+	NeuralNetworkTools();
+	~NeuralNetworkTools();
 
 	void performeTraining();
 	void setOutput( std::vector<char*>* outs );
@@ -21,12 +21,12 @@ private:
 	void createTrainInputs();
 
 private:
-	const int TRAIN_SIZE;
-	const char* NETWORK_FILE;
-	std::vector<char*>* outChars;
-	std::vector<std::vector<float>*> objects;
-	std::vector<std::vector<float>*> objectOuts;
-	CvANN_MLP net;
+	const int mcTrainSize;
+	const char* mcNetworkFile;
+	std::vector<char*>* mOutputStrings;
+	std::vector<std::vector<float>*> mObjects;
+	std::vector<std::vector<float>*> mObjectOutputs;
+	CvANN_MLP mNetwork;
 };
 
 #endif //NEURAL_NET_TOOLS_H

@@ -12,7 +12,7 @@
 #include "Utils.h"
 #include "TesseractLeafRecognizer.h"
 #include "ComponentsTree.h"
-#include "NeuralNetTools.h"
+#include "NeuralNetworkTools.h"
 #include "ImagePreProccessor.h"
 
 namespace {

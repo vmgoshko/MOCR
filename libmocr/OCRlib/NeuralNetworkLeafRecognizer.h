@@ -5,7 +5,7 @@
 #include "LeafRecognizer.h"
 
 class ComponentsTree;
-class NeuralNetTools;
+class NeuralNetworkTools;
 
 namespace cv
 {
@@ -22,7 +22,7 @@ public:
 private:
 	std::string recognizeLeaf( cv::Mat* leaf );
 private:
-	NeuralNetTools* tools;
+	NeuralNetworkTools* tools;
 };
 
 

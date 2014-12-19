@@ -23,4 +23,23 @@ void trim( std::string& str );
 void scaleToHeight(cv::Mat& inImage, int inHeight);
 
 void invert(cv::Mat& inImage);
+
+class LessAverageToNullFunctor
+{
+private:
+	float average;
+public:
+	LessAverageToNullFunctor(float inAverage);
+	void operator()(float& element);
+};
+
+class AddForEach
+{
+private:
+	float offset;
+public:
+	AddForEach(float inOffset);
+	void operator()(float& element);
+};
+
 #endif //UTILS_H
