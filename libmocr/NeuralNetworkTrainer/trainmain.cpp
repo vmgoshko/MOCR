@@ -6,7 +6,7 @@
 #include <queue>
 #include <vector>
 #include "ImagePreProccessor.h"
-#include "NeuralNetTools.h"
+#include "NeuralNetworkTools.h"
 #include "Utils.h"
 
 using namespace cv;
@@ -14,17 +14,17 @@ using namespace std;
 
 void main()
 {
-	NeuralNetTools neuralNetTools;
+	NeuralNetworkTools neuralNetTools;
 	ImagePreProccessor preProcessor;
-	vector<char*>* outChars = getOutsVector();
+	vector<char*>* mOutputStrings = getOutsVector();
 
-	cv::Mat image = preProcessor.process( "img/traindata.bmp" );
-	vector< BlackObject > objects = preProcessor.getBlackObjects();
+	cv::Mat image = preProcessor.process( "img/arev_traindata_fixed.png" );
+	vector< BlackObject > mObjects = preProcessor.getBlackObjects();
 	
-	neuralNetTools.setOutput( outChars );
-	for( size_t i = 0 ; i < objects.size(); i++ )
+	neuralNetTools.setOutput( mOutputStrings );
+	for( size_t i = 0 ; i < mObjects.size(); i++ )
 	{
-		neuralNetTools.addObject( objects[i], i );
+		neuralNetTools.addObject( mObjects[i], i );
 	}
 
 	neuralNetTools.performeTraining();
@@ -32,5 +32,5 @@ void main()
 
 	cvWaitKey();
 	system( "pause" );
-	delete outChars;
+	delete mOutputStrings;
 }
