@@ -9,7 +9,7 @@ using namespace std;
 using namespace cv;
 
 NeuralNetworkTools::NeuralNetworkTools(void) : 
-	mcTrainSize( 8 ), mcNetworkFile("nn")
+mcTrainSize(8), mcNetworkFile("../cvtest/nn")
 {
 }
 
@@ -25,8 +25,11 @@ NeuralNetworkTools::~NeuralNetworkTools(void)
 }
 
 
-void NeuralNetworkTools::performeTraining( )
+void NeuralNetworkTools::performeTraining( bool inIsAppend )
 {
+	if (inIsAppend)
+		mNetwork.load(mcNetworkFile);
+
 	Mat inputs( mObjects.size(), mcTrainSize, CV_32F );
 	Mat outputs( mObjectOutputs.size(), mOutputStrings->size(), CV_32F );
 	
@@ -40,7 +43,7 @@ void NeuralNetworkTools::performeTraining( )
 	params.bp_dw_scale = 0.1f;
 	params.bp_moment_scale = 0.1f;
 	params.term_crit = criteria;
-
+	
 	for (size_t i = 0; i < mObjects.size(); i++)
 	{
 		for (int j = 0; j < mcTrainSize; j++)
@@ -65,8 +68,13 @@ void NeuralNetworkTools::performeTraining( )
 
 	mNetwork.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1 );
 
-	int theIterations = mNetwork.train( inputs, outputs, cv::Mat( ), cv::Mat( ), params );
+	int theIterations;
+	if ( inIsAppend )
+		theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params, CvANN_MLP::UPDATE_WEIGHTS);
+	else
+		theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params);
 	cout << "Training complete with " << theIterations << " iterations" << endl;
+	
 	mNetwork.save( mcNetworkFile );
 }
 
@@ -76,10 +84,10 @@ void showImage( const char* name, cv::Mat& img )
 	cv::imshow( name, img );
 }
 
-void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex )
+void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex, int height )
 {
 	obj = bound(&obj.object, 0);
-	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
+	scaleToHeight(obj.object, height);
 
 	//create input
 	invert( obj.object );
@@ -102,28 +110,36 @@ void NeuralNetworkTools::setOutput( vector<char*>* outs )
 
 const char* NeuralNetworkTools::predict(BlackObject& obj)
 {
+	std::vector< float > theResult = getPossibleChars(obj);
+	int theMaxIndex = distance(theResult.begin(), max_element(theResult.begin(), theResult.end()));
+
+	return mOutputStrings->at(theMaxIndex);
+}
+
+
+std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
+{
 	obj = bound(&obj.object, 0);
 
 	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
 
-	invert( obj.object );
-	SkeletonBuilder::skeleton( obj.object, obj.object );
-	obj = bound( &obj.object, 1 );
-	std::vector< float >* theCharacteristics = new std::vector< float >( SkeletonBuilder::calculateCharacteristic( obj.object, 1 ) );
+	invert(obj.object);
+	SkeletonBuilder::skeleton(obj.object, obj.object);
+	obj = bound(&obj.object, 1);
+	std::vector< float >* theCharacteristics = new std::vector< float >(SkeletonBuilder::calculateCharacteristic(obj.object, 1));
 
-	Mat two( 1, mcTrainSize, CV_32F );
-	Mat predictOutput( 1, mOutputStrings->size(), CV_32F );
-	predictOutput.setTo( 0 );
-	
-	for(int j = 0; j < mcTrainSize; j++)
+	Mat two(1, mcTrainSize, CV_32F);
+	Mat predictOutput(1, mOutputStrings->size(), CV_32F);
+	predictOutput.setTo(0);
+
+	for (int j = 0; j < mcTrainSize; j++)
 	{
 		float theCharacteristic = (float)theCharacteristics->at(j);
-		two.at<float>( 0, j ) = theCharacteristic;
+		two.at<float>(0, j) = theCharacteristic;
 	}
 
 	mNetwork.predict(two, predictOutput);
 
-	int theMaxIndex = 0;
 	float theOffset = 1.5f;
 	float* thePredictOutPtr = predictOutput.ptr<float>(0);
 	int thePredictOutSize = predictOutput.cols;
@@ -132,10 +148,9 @@ const char* NeuralNetworkTools::predict(BlackObject& obj)
 	for_each(theResult.begin(), theResult.end(), AddForEach(theOffset));
 	float average = std::accumulate(theResult.begin(), theResult.end(), 0.f) / theResult.size();
 	for_each(theResult.begin(), theResult.end(), LessAverageToNullFunctor(average));
-	theMaxIndex = distance(theResult.begin(), max_element(theResult.begin(), theResult.end()));
 
 	delete theCharacteristics;
-	return mOutputStrings->at(theMaxIndex);
+	return theResult;
 }
 
 bool NeuralNetworkTools::load()

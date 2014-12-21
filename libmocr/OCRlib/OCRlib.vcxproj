@@ -20,7 +20,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -40,7 +40,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\OpenCV\opencv\build\include;D:\tesseract\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\tesseract\lib;D:\OpenCV\opencv\build\x86\vc10\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -82,28 +82,26 @@
     <ClInclude Include="CharTemplate.h" />
     <ClInclude Include="ComponentsTree.h" />
     <ClInclude Include="Defs.h" />
-    <ClInclude Include="Filter.h" />
-    <ClInclude Include="GaussianBlurFilter.h" />
+    <ClInclude Include="Filters.h" />
     <ClInclude Include="ImagePreProccessor.h" />
     <ClInclude Include="LeafRecognizer.h" />
     <ClInclude Include="NeuralNetworkLeafRecognizer.h" />
+    <ClInclude Include="NeuralNetworkTools.h" />
     <ClInclude Include="SkeletonBuilder.h" />
+    <ClInclude Include="TemplateTools.h" />
     <ClInclude Include="TesseractLeafRecognizer.h" />
-    <ClInclude Include="NeuralNetTools.h" />
     <ClInclude Include="PatternLeafRecognizer.h" />
     <ClInclude Include="Structurer.h" />
-    <ClInclude Include="ThresholdFilter.h" />
+    <ClInclude Include="TwoStepsLeafRecognizer.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ComponentsTree.cpp" />
-    <ClCompile Include="Filter.cpp" />
-    <ClCompile Include="GaussianBlurFilter.cpp" />
+    <ClCompile Include="Filters.cpp" />
     <ClCompile Include="ImagePreProccessor.cpp" />
     <ClCompile Include="NeuralNetworkLeafRecognizer.cpp" />
+    <ClCompile Include="NeuralNetworkTools.cpp" />
     <ClCompile Include="TesseractLeafRecognizer.cpp" />
-    <ClCompile Include="NeuralNetTools.cpp" />
-    <ClCompile Include="ThresholdFilter.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -11,12 +11,20 @@ public:
 	NeuralNetworkTools();
 	~NeuralNetworkTools();
 
-	void performeTraining();
+	void performeTraining(bool inIsAppend);
 	void setOutput( std::vector<char*>* outs );
-	void addObject( BlackObject& obj, int outIndex );
+	void addObject(BlackObject& obj, int outIndex, int height);
 	const char* predict(BlackObject& object);
+	std::vector< float > getPossibleChars(BlackObject& object);
 	bool load();
 	bool save(const char* name);
+	void clear()
+	{
+		delete mOutputStrings;
+		mObjects.clear();
+		mObjectOutputs.clear();
+	}
+
 private:
 	void createTrainInputs();
 

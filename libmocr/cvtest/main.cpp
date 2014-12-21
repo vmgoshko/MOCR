@@ -5,10 +5,11 @@
 #include <fstream>
 
 #include "ImagePreProccessor.h"
-#include "NeuralNetTools.h"
+#include "NeuralNetworkTools.h"
 #include "ComponentsTree.h"
 #include "Utils.h"
 #include "NeuralNetworkLeafRecognizer.h"
+#include "TwoStepsLeafRecognizer.h"
 #include "Structurer.h"
 #include "SkeletonBuilder.h"
 #include "Utils.h"
@@ -19,7 +20,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 namespace {
-	const char* imagePath = "img/7.bmp";
+	const char* imagePath = "img/arev_traindata_fixed.png";
 	const char* outPath = "result.txt";
 };
 
@@ -50,12 +51,14 @@ public:
 		
 		cv::Mat theProcessedImage = thePreProcessor.process( mImgPath );
 		theTree.build(theProcessedImage);
-		std::vector< std::string > theLeafsStrs = theRecognizer.recognizeLeafs(&theTree);
-		std::string theResult = theStructurer.structure(theProcessedImage, theTree.getLeafs(), theLeafsStrs);
 
-		return theResult;
+		std::vector< std::string > theLeafsStrs = theRecognizer.recognizeLeafs(&theTree);
+		//std::string theResult = theStructurer.structure(theProcessedImage, theTree.getLeafs(), theLeafsStrs);
+
+		return "";
 	}
 };
+
 
 void main()
 {
@@ -73,7 +76,28 @@ void main()
 	for( int i = 0; i < theBlackObjects.size(); i++ )
 	{
 		std::cout << theTools.predict( theBlackObjects[ i ] ) << std::endl;
-	}*/
+	}
+	/*
+	ImagePreProccessor thePreProcessor;
+	cv::Mat image  = thePreProcessor.process("templ/10.jpg");
+	scaleToHeight(image, 150);
+
+	ThresholdFilter theFilter;
+	theFilter.init(&image);
+	theFilter.doFilter();
+	SkeletonBuilder theSkeletonBuilder;
+	invert(image);
+	theSkeletonBuilder.skeleton(image, image);
+
+	for (int i = 0; i < image.rows; i++)
+	{
+		for (int j = 0; j < image.cols; j++ )
+		if (image.at<float>(i, j) != 0)
+		{
+			cycleSearch(image, i, j);
+		}
+	}
+	int c = count;*/
 	system("pause");
 	cvWaitKey( 0 );
 }

@@ -6,6 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include <vector>
+#include <queue>
 
 #include "Utils.h"
 
@@ -169,8 +170,91 @@ public:
                         outputarray.at<float>( i, j) = p_enlarged_src.at<float>( i+1, j+1);
                 }
         }
-}
+	}
 	
+	struct Node
+	{
+		int x;
+		int y;
+		Node* prev;
+
+		Node()
+		{
+			x = -1;
+			y = -1;
+		}
+
+		Node(int i, int j, Node* inPrev)
+		{
+			x = i;
+			y = j;
+			prev = inPrev;
+		}
+
+		bool isPrev(Node* node)
+		{
+			if (x == -1 && y == -1)
+				return false;
+			else if ((node->x == prev->x) && (node->y == prev->y))
+				return true;
+			else
+				return prev->isPrev(node);
+		}
+	};
+
+	static void cycleSearch(cv::Mat& image, int i, int j, int& count)
+	{
+		std::queue< Node* > theQueue;
+
+		theQueue.push(new Node(i, j, new Node()));
+
+		while (!theQueue.empty())
+		{
+			Node* theNode = theQueue.front();
+			theQueue.pop();
+			
+			if (theNode->x < 0 || theNode->x >= image.rows || theNode->y < 0 || theNode->y >= image.cols)
+				continue;
+
+			float thePx = image.at<float>(theNode->x, theNode->y);
+
+			if (thePx == 0)
+				continue;
+
+			if (thePx > 0 && thePx < 1)
+			{	
+				count++;
+				image.at<float>(theNode->x, theNode->y) -= 0.1;
+				continue;
+			}
+
+			if (thePx == 1)
+				image.at<float>(theNode->x, theNode->y) -= 0.1;
+			
+			bool isFound = false;
+			for (int k = theNode->x - 1; k <= theNode->x + 1; k++)
+			{
+				for (int l = theNode->y - 1; l <= theNode->y + 1; l++)
+				{
+					if (k < 0 || k >= image.rows || l < 0 || l >= image.cols || (k == theNode->x && l == theNode->y))
+						continue;
+
+					Node* n = new Node(k, l, theNode);
+					if (image.at<float>(k, l) && !theNode->isPrev(n))
+					{
+						theQueue.push(n);
+						isFound = true;
+						break;
+					}
+					else
+						delete n;
+				}
+				if (isFound)
+					break;
+			}
+		}
+	}
+
 	/*
 		Функция вычисляет характеристики скилета изображения:
 		1. Центр тяжести относительно оси OX
@@ -190,6 +274,7 @@ public:
 	*/
 	static std::vector< float > calculateCharacteristic( cv::Mat& inSkeleton, float inObjectColor )
 	{
+		cv::Mat theSavedSkeleton = inSkeleton;
 		cv::Mat theBoundedSkeleton = bound( &inSkeleton, 1 ).object;
 		
 		int theHeight = theBoundedSkeleton.rows;
@@ -272,6 +357,10 @@ public:
 			theCharacteristics[ 3 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 3 ] /= theHeight;
 		
+		/*	theCharacteristics[8] /= theSkeletonPixelsCount;
+			theCharacteristics[8] /= theWidth;
+			theCharacteristics[8] /= theHeight;
+			*/
 			theCharacteristics[ 0 ] /= theWidth;
 			theCharacteristics[ 1 ] /= theHeight;
 			
