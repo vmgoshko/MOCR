@@ -11,25 +11,17 @@ public:
 	NeuralNetworkTools();
 	~NeuralNetworkTools();
 
-	void performeTraining(bool inIsAppend);
+	void performeTraining();
 	void setOutput( std::vector<char*>* outs );
-	void addObject(BlackObject& obj, int outIndex, int height);
+	void addObject(BlackObject& obj, int outIndex);
 	const char* predict(BlackObject& object);
 	std::vector< float > getPossibleChars(BlackObject& object);
 	bool load();
 	bool save(const char* name);
-	void clear()
-	{
-		delete mOutputStrings;
-		mObjects.clear();
-		mObjectOutputs.clear();
-	}
 
 private:
-	void createTrainInputs();
-
+	void fillCriteriaAndParams(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams);
 private:
-	const int mcTrainSize;
 	const char* mcNetworkFile;
 	std::vector<char*>* mOutputStrings;
 	std::vector<std::vector<float>*> mObjects;

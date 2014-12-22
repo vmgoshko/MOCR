@@ -158,10 +158,10 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		j--;
 	}
 
-	if (b.b != h - 1)
+	if (b.b != h)
 		b.b += 1;
 
-	if (b.r != w - 1)
+	if (b.r != w)
 		b.r += 1;
 
 	BlackObject obj;

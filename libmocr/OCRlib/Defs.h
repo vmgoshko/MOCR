@@ -5,7 +5,7 @@
 
 namespace Config
 {
-	const int cNeuralNetworkImageHeight = 100;
+	const int cNeuralNetworkImageHeight = 150;
 }
 
 struct Bound 

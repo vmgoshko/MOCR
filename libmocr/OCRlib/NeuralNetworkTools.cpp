@@ -8,8 +8,8 @@
 using namespace std;
 using namespace cv;
 
-NeuralNetworkTools::NeuralNetworkTools(void) : 
-mcTrainSize(8), mcNetworkFile("../cvtest/nn")
+NeuralNetworkTools::NeuralNetworkTools(void) 
+	: mcNetworkFile("../cvtest/nn")
 {
 }
 
@@ -21,32 +21,33 @@ NeuralNetworkTools::~NeuralNetworkTools(void)
 	
 	for (int i = 0; i < mObjectOutputs.size(); i++)
 		delete mObjectOutputs[i];
-
 }
 
-
-void NeuralNetworkTools::performeTraining( bool inIsAppend )
+void NeuralNetworkTools::fillCriteriaAndParams(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams)
 {
-	if (inIsAppend)
-		mNetwork.load(mcNetworkFile);
+	//criteria.max_iter = 200;
+	outCriteria.epsilon = 0.00001f;
+	outCriteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
 
-	Mat inputs( mObjects.size(), mcTrainSize, CV_32F );
+	outTrainParams.train_method = CvANN_MLP_TrainParams::BACKPROP;
+	outTrainParams.bp_dw_scale = 0.1f;
+	outTrainParams.bp_moment_scale = 0.1f;
+	outTrainParams.term_crit = outCriteria;
+}
+
+void NeuralNetworkTools::performeTraining()
+{
+	Mat inputs(mObjects.size(), mObjects[0]->size(), CV_32F);
 	Mat outputs( mObjectOutputs.size(), mOutputStrings->size(), CV_32F );
 	
 	CvTermCriteria criteria;
-	//criteria.max_iter = 200;
-	criteria.epsilon = 0.00001f;
-	criteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
-
 	CvANN_MLP_TrainParams params;
-	params.train_method = CvANN_MLP_TrainParams::BACKPROP;
-	params.bp_dw_scale = 0.1f;
-	params.bp_moment_scale = 0.1f;
-	params.term_crit = criteria;
 	
+	fillCriteriaAndParams(criteria, params);
+
 	for (size_t i = 0; i < mObjects.size(); i++)
 	{
-		for (int j = 0; j < mcTrainSize; j++)
+		for (int j = 0; j < mObjects[i]->size(); j++)
 		{
 			float theCharacteristic = mObjects[i]->at(j);
 			inputs.at<float>(i, j) = theCharacteristic;
@@ -62,20 +63,15 @@ void NeuralNetworkTools::performeTraining( bool inIsAppend )
 	}
 
 	Mat layers( 1, 3, CV_32S );
-	layers.at<int>( 0, 0 ) = mcTrainSize;
+	layers.at<int>( 0, 0 ) = mObjects[0]->size();
 	layers.at<int>( 0, 1 ) = mObjects.size();
 	layers.at<int>( 0, 2 ) = mOutputStrings->size();
 
 	mNetwork.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1 );
 
 	int theIterations;
-	if ( inIsAppend )
-		theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params, CvANN_MLP::UPDATE_WEIGHTS);
-	else
-		theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params);
+	theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params);
 	cout << "Training complete with " << theIterations << " iterations" << endl;
-	
-	mNetwork.save( mcNetworkFile );
 }
 
 void showImage( const char* name, cv::Mat& img )
@@ -84,10 +80,10 @@ void showImage( const char* name, cv::Mat& img )
 	cv::imshow( name, img );
 }
 
-void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex, int height )
+void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex )
 {
 	obj = bound(&obj.object, 0);
-	scaleToHeight(obj.object, height);
+	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
 
 	//create input
 	invert( obj.object );
@@ -128,11 +124,11 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 	obj = bound(&obj.object, 1);
 	std::vector< float >* theCharacteristics = new std::vector< float >(SkeletonBuilder::calculateCharacteristic(obj.object, 1));
 
-	Mat two(1, mcTrainSize, CV_32F);
+	Mat two(1, theCharacteristics->size(), CV_32F);
 	Mat predictOutput(1, mOutputStrings->size(), CV_32F);
 	predictOutput.setTo(0);
 
-	for (int j = 0; j < mcTrainSize; j++)
+	for (int j = 0; j < theCharacteristics->size(); j++)
 	{
 		float theCharacteristic = (float)theCharacteristics->at(j);
 		two.at<float>(0, j) = theCharacteristic;

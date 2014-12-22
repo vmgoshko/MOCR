@@ -255,6 +255,23 @@ public:
 		}
 	}
 
+	static int neighboursCount(cv::Mat& inSkeleton, float inObjectColor,int inRow, int inCol)
+	{
+		int theNeighboursCount = 0;
+		for (int i = inRow - 1; i <= inRow + 1; i++)
+			for (int j = inCol - 1; j <= inCol + 1; j++)
+			{
+				if (i < 0 || j < 0 || i >= inSkeleton.rows || j >= inSkeleton.cols)
+					continue;
+
+				if (i == inRow && j == inCol)
+					continue;
+
+				if (inSkeleton.at<float>(i, j) == inObjectColor)
+					theNeighboursCount++;
+			}
+			return theNeighboursCount;
+	}
 	/*
 		Функция вычисляет характеристики скилета изображения:
 		1. Центр тяжести относительно оси OX
@@ -286,12 +303,16 @@ public:
 		int theMainDiagonalJoinCount = 0;
 		int theSideDiagonalJoinCount = 0;
 
-		std::vector< float > theCharacteristics( 8, 0 );
+		std::vector< float > theCharacteristics( 9, 0 );
 
 		for( int i = 0; i < theHeight; i++ )
 			for( int j = 0; j < theWidth; j++ )
 			{
+				if (i == 127 && j == 0)
+					int a = 0;
 				float thePixel = theBoundedSkeleton.at< float >( i, j );
+				
+
 				if( thePixel > 0 )
 				{
 					//подсчет соседства
@@ -324,6 +345,9 @@ public:
 					// Количество скелетных точек, связанных с соседними по обратной диагонали, к общему количеству скелетных точек:
 					/*else*/ if( theTopRight == inObjectColor || theBottomLeft == inObjectColor )
 						theCharacteristics[ 7 ] += 1;
+
+					if (neighboursCount(theBoundedSkeleton, inObjectColor, i, j) == 1)
+						theCharacteristics[8]++;
 				}
 			}
 
@@ -357,10 +381,6 @@ public:
 			theCharacteristics[ 3 ] /= theSkeletonPixelsCount;
 			theCharacteristics[ 3 ] /= theHeight;
 		
-		/*	theCharacteristics[8] /= theSkeletonPixelsCount;
-			theCharacteristics[8] /= theWidth;
-			theCharacteristics[8] /= theHeight;
-			*/
 			theCharacteristics[ 0 ] /= theWidth;
 			theCharacteristics[ 1 ] /= theHeight;
 			

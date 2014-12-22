@@ -19,19 +19,16 @@ void main()
 	ImagePreProccessor preProcessor;
 
 	cv::Mat image = preProcessor.process("img/arev_traindata_fixed.png");
-	for (int j = 0; j < 3; j++)
+	
+	vector< BlackObject > mObjects = preProcessor.getBlackObjects();
+	neuralNetTools.setOutput(getOutsVector());
+	for (size_t i = 0; i < mObjects.size(); i++)
 	{
-		vector< BlackObject > mObjects = preProcessor.getBlackObjects();
-		neuralNetTools.setOutput(getOutsVector());
-		for (size_t i = 0; i < mObjects.size(); i++)
-		{
-			neuralNetTools.addObject(mObjects[i], i, 50 + j * 50);
-		}
-
-		neuralNetTools.performeTraining( j != 0 );
-		neuralNetTools.clear();
+		neuralNetTools.addObject(mObjects[i], i);
 	}
 
+	neuralNetTools.performeTraining();
+	neuralNetTools.save("../cvtest/nn");
 	cvWaitKey();
 	system( "pause" );
 }

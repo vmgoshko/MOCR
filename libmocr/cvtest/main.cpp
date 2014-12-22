@@ -20,7 +20,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 namespace {
-	const char* imagePath = "img/arev_traindata_fixed.png";
+	const char* imagePath = "img/arev_2.png";
 	const char* outPath = "result.txt";
 };
 
