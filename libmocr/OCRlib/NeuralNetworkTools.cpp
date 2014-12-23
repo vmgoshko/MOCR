@@ -26,7 +26,7 @@ NeuralNetworkTools::~NeuralNetworkTools(void)
 void NeuralNetworkTools::fillCriteriaAndParams(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams)
 {
 	//criteria.max_iter = 200;
-	outCriteria.epsilon = 0.00001f;
+	outCriteria.epsilon = 0.0001f;
 	outCriteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
 
 	outTrainParams.train_method = CvANN_MLP_TrainParams::BACKPROP;
@@ -69,8 +69,7 @@ void NeuralNetworkTools::performeTraining()
 
 	mNetwork.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1 );
 
-	int theIterations;
-	theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params);
+	int theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params);
 	cout << "Training complete with " << theIterations << " iterations" << endl;
 }
 
@@ -84,13 +83,14 @@ void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex )
 {
 	obj = bound(&obj.object, 0);
 	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
-
+	copyMakeBorder(obj.object, obj.object, 1, 1, 1, 1, BORDER_CONSTANT, 255);
+	
 	//create input
 	invert( obj.object );
-	SkeletonBuilder::skeleton( obj.object, obj.object );
-	obj = bound( &obj.object, 1 );
+	SkeletonBuilder::thinning(obj.object);
+	obj = bound(&obj.object, 255);
 
-	std::vector< float >* theCharacteristics = new std::vector< float >( SkeletonBuilder::calculateCharacteristic( obj.object, 1 ) );
+	std::vector< float >* theCharacteristics = new std::vector< float >( SkeletonBuilder::calculateCharacteristic( obj.object, 255 ) );
 	mObjects.push_back( theCharacteristics );
 
 	//create output
@@ -108,7 +108,6 @@ const char* NeuralNetworkTools::predict(BlackObject& obj)
 {
 	std::vector< float > theResult = getPossibleChars(obj);
 	int theMaxIndex = distance(theResult.begin(), max_element(theResult.begin(), theResult.end()));
-
 	return mOutputStrings->at(theMaxIndex);
 }
 
@@ -116,21 +115,21 @@ const char* NeuralNetworkTools::predict(BlackObject& obj)
 std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 {
 	obj = bound(&obj.object, 0);
-
 	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
+	copyMakeBorder(obj.object, obj.object, 1, 1, 1, 1, BORDER_CONSTANT, 255);
 
 	invert(obj.object);
-	SkeletonBuilder::skeleton(obj.object, obj.object);
-	obj = bound(&obj.object, 1);
-	std::vector< float >* theCharacteristics = new std::vector< float >(SkeletonBuilder::calculateCharacteristic(obj.object, 1));
+	SkeletonBuilder::thinning(obj.object);
+	obj = bound(&obj.object, 255);
+	std::vector< float > theCharacteristics = SkeletonBuilder::calculateCharacteristic(obj.object, 255);
 
-	Mat two(1, theCharacteristics->size(), CV_32F);
+	Mat two(1, theCharacteristics.size(), CV_32F);
 	Mat predictOutput(1, mOutputStrings->size(), CV_32F);
 	predictOutput.setTo(0);
 
-	for (int j = 0; j < theCharacteristics->size(); j++)
+	for (int j = 0; j < theCharacteristics.size(); j++)
 	{
-		float theCharacteristic = (float)theCharacteristics->at(j);
+		float theCharacteristic = (float)theCharacteristics.at(j);
 		two.at<float>(0, j) = theCharacteristic;
 	}
 
@@ -145,7 +144,6 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 	float average = std::accumulate(theResult.begin(), theResult.end(), 0.f) / theResult.size();
 	for_each(theResult.begin(), theResult.end(), LessAverageToNullFunctor(average));
 
-	delete theCharacteristics;
 	return theResult;
 }
 

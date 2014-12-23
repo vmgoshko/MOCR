@@ -99,8 +99,8 @@ public:
 				int maxX = 0;
 				while ( j < leafs.size() && isBelow( sum, next ) )
 				{
-					if ( maxX < prev.maxX ) 
-						maxX = prev.maxX;
+					if (maxX < next.maxX)
+						maxX = next.maxX;
 
 					belowSumLeafs.push_back( leafs[j] );
 					belowSumStrs.push_back( strs[j] );
@@ -357,7 +357,7 @@ public:
 		}
 
 		Bound b( row[0].minY, row[0].maxY, row[0].minX, row[0].maxX );
-		for( int j = 1; j < row.size(); j++ )
+		for( size_t j = 1; j < row.size(); j++ )
 		{
 			if( b.l > row[j].minY )
 				b.l = row[j].minY;
@@ -393,13 +393,13 @@ private:
 
 	bool isSuperscript( BlackObject& curr, BlackObject& next )
 	{
-		int shift = floor( ( curr.maxX - curr.minX ) * 0.3f );
+		int shift = (int)floor((curr.maxX - curr.minX) * 0.3f);
 		return next.maxX < curr.maxX - shift && next.maxX > curr.minX && next.minX < curr.minX;
 	}
 
 	bool isSubscript( BlackObject& curr, BlackObject& next )
 	{
-		int shift = floor( ( curr.maxX - curr.minX ) * 0.3f );
+		int shift = (int)floor((curr.maxX - curr.minX) * 0.3f);
 		return next.minX > curr.minX + shift && next.minX < curr.maxX && next.maxX > curr.maxX;
 	}
 
@@ -410,7 +410,7 @@ private:
 	*/
 	bool isUnder( BlackObject& curr, BlackObject& next )
 	{
-		int delta = floor( (curr.maxY - curr.minY) * 0.1f );
+		int delta = (int)floor((curr.maxY - curr.minY) * 0.1f);
 		return ( next.maxY < curr.maxY + delta ) && ( next.minY > curr.minY - delta ) &&
 			( next.maxX < curr.minX );
 	}
@@ -422,7 +422,7 @@ private:
 	*/
 	bool isBelow( BlackObject& curr, BlackObject& next )
 	{
-		int delta = floor( (curr.maxY - curr.minY) * 0.1f );
+		int delta = (int)floor( (curr.maxY - curr.minY) * 0.1f );
 		return ( next.maxY < curr.maxY + delta ) && ( next.minY > curr.minY - delta ) &&
 			( next.minX > curr.maxX );
 	}

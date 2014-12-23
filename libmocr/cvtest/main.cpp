@@ -20,7 +20,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 namespace {
-	const char* imagePath = "img/arev_2.png";
+	const char* imagePath = "img/iwona_2.png";
 	const char* outPath = "result.txt";
 };
 
@@ -51,11 +51,10 @@ public:
 		
 		cv::Mat theProcessedImage = thePreProcessor.process( mImgPath );
 		theTree.build(theProcessedImage);
-
 		std::vector< std::string > theLeafsStrs = theRecognizer.recognizeLeafs(&theTree);
-		//std::string theResult = theStructurer.structure(theProcessedImage, theTree.getLeafs(), theLeafsStrs);
+		std::string theResult = theStructurer.structure(theProcessedImage, theTree.getLeafs(), theLeafsStrs);
 
-		return "";
+		return theResult;
 	}
 };
 
@@ -64,40 +63,6 @@ void main()
 {
 	NativeRecognizer theNativeRecognizer(imagePath);
 	std::cout << theNativeRecognizer.recognize() << std::endl;
-	/*
-	ImagePreProccessor thePreProcessor;
-	NeuralNetTools theTools;
-	theTools.load();
-	theTools.setOutput( getOutsVector() );
-
-	thePreProcessor.process( "img/4.bmp" );
-	std::vector< BlackObject > theBlackObjects = thePreProcessor.getBlackObjects();
-	
-	for( int i = 0; i < theBlackObjects.size(); i++ )
-	{
-		std::cout << theTools.predict( theBlackObjects[ i ] ) << std::endl;
-	}
-	/*
-	ImagePreProccessor thePreProcessor;
-	cv::Mat image  = thePreProcessor.process("templ/10.jpg");
-	scaleToHeight(image, 150);
-
-	ThresholdFilter theFilter;
-	theFilter.init(&image);
-	theFilter.doFilter();
-	SkeletonBuilder theSkeletonBuilder;
-	invert(image);
-	theSkeletonBuilder.skeleton(image, image);
-
-	for (int i = 0; i < image.rows; i++)
-	{
-		for (int j = 0; j < image.cols; j++ )
-		if (image.at<float>(i, j) != 0)
-		{
-			cycleSearch(image, i, j);
-		}
-	}
-	int c = count;*/
 	system("pause");
 	cvWaitKey( 0 );
 }

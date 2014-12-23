@@ -243,7 +243,7 @@ void scaleToHeight(cv::Mat& inImage, int inHeight)
 {
 	float theScaleFactor = (float)inHeight / inImage.rows;
 
-	cv::resize(inImage, inImage, cv::Size(ceil(inImage.cols * theScaleFactor), ceil(inImage.rows * theScaleFactor)));
+	cv::resize(inImage, inImage, cv::Size((int)ceil(inImage.cols * theScaleFactor), (int)ceil(inImage.rows * theScaleFactor)));
 }
 
 void invert(cv::Mat& inImage)

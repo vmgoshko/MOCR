@@ -15,6 +15,9 @@
 class SkeletonBuilder
 {
 private:
+	
+
+
 	static void ThinSubiteration1(cv::Mat & pSrc, cv::Mat & pDst) 
 	{
 		int rows = pSrc.rows;
@@ -113,6 +116,68 @@ private:
 }
 
 public:
+	/**
+	* Perform one thinning iteration.
+	* Normally you wouldn't call this function directly from your code.
+	*
+	* @param  im    Binary image with range = 0-1
+	* @param  iter  0=even, 1=odd
+	*/
+	static void thinningIteration(cv::Mat& im, int iter)
+	{
+		cv::Mat marker = cv::Mat::zeros(im.size(), CV_8UC1);
+
+		for (int i = 1; i < im.rows - 1; i++)
+		{
+			for (int j = 1; j < im.cols - 1; j++)
+			{
+				uchar p2 = im.at<uchar>(i - 1, j);
+				uchar p3 = im.at<uchar>(i - 1, j + 1);
+				uchar p4 = im.at<uchar>(i, j + 1);
+				uchar p5 = im.at<uchar>(i + 1, j + 1);
+				uchar p6 = im.at<uchar>(i + 1, j);
+				uchar p7 = im.at<uchar>(i + 1, j - 1);
+				uchar p8 = im.at<uchar>(i, j - 1);
+				uchar p9 = im.at<uchar>(i - 1, j - 1);
+
+				int A = (p2 == 0 && p3 == 1) + (p3 == 0 && p4 == 1) +
+					(p4 == 0 && p5 == 1) + (p5 == 0 && p6 == 1) +
+					(p6 == 0 && p7 == 1) + (p7 == 0 && p8 == 1) +
+					(p8 == 0 && p9 == 1) + (p9 == 0 && p2 == 1);
+				int B = p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9;
+				int m1 = iter == 0 ? (p2 * p4 * p6) : (p2 * p4 * p8);
+				int m2 = iter == 0 ? (p4 * p6 * p8) : (p2 * p6 * p8);
+
+				if (A == 1 && (B >= 2 && B <= 6) && m1 == 0 && m2 == 0)
+					marker.at<uchar>(i, j) = 1;
+			}
+		}
+
+		im &= ~marker;
+	}
+
+	/**
+	* Function for thinning the given binary image
+	*
+	* @param  im  Binary image with range = 0-255
+	*/
+	static void thinning(cv::Mat& im)
+	{
+		im /= 255;
+
+		cv::Mat prev = cv::Mat::zeros(im.size(), CV_8UC1);
+		cv::Mat diff;
+
+		do {
+			thinningIteration(im, 0);
+			thinningIteration(im, 1);
+			cv::absdiff(im, prev, diff);
+			im.copyTo(prev);
+		} while (cv::countNonZero(diff) > 0);
+
+		im *= 255;
+	}
+
 	static void skeleton(cv::Mat & inputarray, cv::Mat & outputarray) {
         bool bDone = false;
         int rows = inputarray.rows;
@@ -224,12 +289,12 @@ public:
 			if (thePx > 0 && thePx < 1)
 			{	
 				count++;
-				image.at<float>(theNode->x, theNode->y) -= 0.1;
+				image.at<float>(theNode->x, theNode->y) -= 0.1f;
 				continue;
 			}
 
 			if (thePx == 1)
-				image.at<float>(theNode->x, theNode->y) -= 0.1;
+				image.at<float>(theNode->x, theNode->y) -= 0.1f;
 			
 			bool isFound = false;
 			for (int k = theNode->x - 1; k <= theNode->x + 1; k++)
@@ -267,7 +332,7 @@ public:
 				if (i == inRow && j == inCol)
 					continue;
 
-				if (inSkeleton.at<float>(i, j) == inObjectColor)
+				if (inSkeleton.at< unsigned char >(i, j) == inObjectColor)
 					theNeighboursCount++;
 			}
 			return theNeighboursCount;
@@ -292,7 +357,7 @@ public:
 	static std::vector< float > calculateCharacteristic( cv::Mat& inSkeleton, float inObjectColor )
 	{
 		cv::Mat theSavedSkeleton = inSkeleton;
-		cv::Mat theBoundedSkeleton = bound( &inSkeleton, 1 ).object;
+		cv::Mat theBoundedSkeleton = bound(&inSkeleton, inObjectColor).object;
 		
 		int theHeight = theBoundedSkeleton.rows;
 		int theWidth = theBoundedSkeleton.cols;
@@ -310,20 +375,20 @@ public:
 			{
 				if (i == 127 && j == 0)
 					int a = 0;
-				float thePixel = theBoundedSkeleton.at< float >( i, j );
+				unsigned char thePixel = theBoundedSkeleton.at< unsigned char >( i, j );
 				
 
 				if( thePixel > 0 )
 				{
 					//подсчет соседства
-					float theTop = ( i > 0 ) ? theBoundedSkeleton.at< float >( i - 1, j ) : 0;
-					float theTopRight = ( i > 0 ) && ( j < theWidth - 1 ) ? theBoundedSkeleton.at< float >( i - 1, j + 1 ) : 0;
-					float theRight = ( j < theWidth - 1 ) ? theBoundedSkeleton.at< float >( i, j + 1 ) : 0;
-					float theBottomRight = ( i < theHeight - 1 ) && ( j < theWidth - 1 ) ? theBoundedSkeleton.at< float >( i + 1, j + 1 ) : 0;
-					float theBottom = ( i < theHeight - 1 ) ? theBoundedSkeleton.at< float >( i + 1, j ) : 0;
-					float theBottomLeft = ( i < theHeight - 1 ) && ( j > 0 ) ? theBoundedSkeleton.at< float >( i + 1, j - 1 ) : 0;
-					float theLeft = ( j > 0 ) ? theBoundedSkeleton.at< float >( i, j - 1 ) : 0;
-					float theTopLeft = ( i > 0 ) && ( j > 0 ) ? theBoundedSkeleton.at< float >( i - 1, j - 1 ) : 0;
+					unsigned char theTop = ( i > 0 ) ? theBoundedSkeleton.at< unsigned char >( i - 1, j ) : 0;
+					unsigned char theTopRight = ( i > 0 ) && ( j < theWidth - 1 ) ? theBoundedSkeleton.at< unsigned char >( i - 1, j + 1 ) : 0;
+					unsigned char theRight = ( j < theWidth - 1 ) ? theBoundedSkeleton.at< unsigned char >( i, j + 1 ) : 0;
+					unsigned char theBottomRight = ( i < theHeight - 1 ) && ( j < theWidth - 1 ) ? theBoundedSkeleton.at< unsigned char >( i + 1, j + 1 ) : 0;
+					unsigned char theBottom = ( i < theHeight - 1 ) ? theBoundedSkeleton.at< unsigned char >( i + 1, j ) : 0;
+					unsigned char theBottomLeft = ( i < theHeight - 1 ) && ( j > 0 ) ? theBoundedSkeleton.at< unsigned char >( i + 1, j - 1 ) : 0;
+					unsigned char theLeft = ( j > 0 ) ? theBoundedSkeleton.at< unsigned char >( i, j - 1 ) : 0;
+					unsigned char theTopLeft = ( i > 0 ) && ( j > 0 ) ? theBoundedSkeleton.at< unsigned char >( i - 1, j - 1 ) : 0;
 
 					// Количество точек скелета
 					theSkeletonPixelsCount++;
@@ -362,7 +427,7 @@ public:
 			for( int i = 0; i < theHeight; i++ )
 				for( int j = 0; j < theWidth; j++ )
 				{
-					float thePixel = theBoundedSkeleton.at< float >( i, j );
+					unsigned char thePixel = theBoundedSkeleton.at< unsigned char >( i, j );
 
 					if( thePixel > 0 )
 					{
