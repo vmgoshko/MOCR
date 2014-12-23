@@ -15,7 +15,7 @@ public:
 	{
 		int h = m.rows;
 		int w = m.cols;
-		unsigned char curr = m.at<unsigned char>(i,j);
+		uchar curr = m.at<uchar>(i,j);
 
 		for(int k = i - 1; k <= i + 1; k++)
 			for(int l = j - 1; l <= j + 1; l++)
@@ -26,7 +26,7 @@ public:
 				if( k == i && l == j )
 					continue;
 
-				if( m.at<unsigned char>( k, l ) == curr )
+				if( m.at<uchar>( k, l ) == curr )
 					return false;
 			}
 
@@ -63,8 +63,8 @@ public:
 		for(int i = 0; i < h && i < img.rows; i++)
 			for(int j = 0; j < w && j < img.cols; j++)
 			{
-				unsigned char templPx = templ.at<unsigned char>(i,j);
-				unsigned char imgPx = img.at<unsigned char>(i,j);
+				uchar templPx = templ.at<uchar>(i,j);
+				uchar imgPx = img.at<uchar>(i,j);
 
 				matchedPx += abs(templPx - imgPx) < 50 ? 2 : -2;
 			}

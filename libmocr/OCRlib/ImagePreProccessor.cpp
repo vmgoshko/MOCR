@@ -102,8 +102,9 @@ cv::Mat ImagePreProccessor::process( const char* path, bool doFiltering )
 {
 	GaussianBlurFilter theGaussianBlur; 
 	ThresholdFilter theThresholdFilter;
-
-	img = imread(path , IMREAD_GRAYSCALE);
+	
+	if ( path )
+		img = imread(path , IMREAD_GRAYSCALE);
 
 	if( doFiltering )
 	{

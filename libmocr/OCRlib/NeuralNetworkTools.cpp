@@ -26,7 +26,7 @@ NeuralNetworkTools::~NeuralNetworkTools(void)
 void NeuralNetworkTools::fillCriteriaAndParams(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams)
 {
 	//criteria.max_iter = 200;
-	outCriteria.epsilon = 0.0001f;
+	outCriteria.epsilon = 0.00001f;
 	outCriteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
 
 	outTrainParams.train_method = CvANN_MLP_TrainParams::BACKPROP;
@@ -87,7 +87,7 @@ void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex )
 	
 	//create input
 	invert( obj.object );
-	SkeletonBuilder::thinning(obj.object);
+	SkeletonBuilder::thinningGuoHall(obj.object);
 	obj = bound(&obj.object, 255);
 
 	std::vector< float >* theCharacteristics = new std::vector< float >( SkeletonBuilder::calculateCharacteristic( obj.object, 255 ) );
@@ -119,21 +119,16 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 	copyMakeBorder(obj.object, obj.object, 1, 1, 1, 1, BORDER_CONSTANT, 255);
 
 	invert(obj.object);
-	SkeletonBuilder::thinning(obj.object);
+	SkeletonBuilder::thinningGuoHall(obj.object);
 	obj = bound(&obj.object, 255);
 	std::vector< float > theCharacteristics = SkeletonBuilder::calculateCharacteristic(obj.object, 255);
 
-	Mat two(1, theCharacteristics.size(), CV_32F);
-	Mat predictOutput(1, mOutputStrings->size(), CV_32F);
-	predictOutput.setTo(0);
+	Mat input(1, theCharacteristics.size(), CV_32F);
+	Mat predictOutput = Mat::zeros(1, mOutputStrings->size(), CV_32F);
 
-	for (int j = 0; j < theCharacteristics.size(); j++)
-	{
-		float theCharacteristic = (float)theCharacteristics.at(j);
-		two.at<float>(0, j) = theCharacteristic;
-	}
+	copy(theCharacteristics.begin(), theCharacteristics.end(), input.ptr<float>());
 
-	mNetwork.predict(two, predictOutput);
+	mNetwork.predict(input, predictOutput);
 
 	float theOffset = 1.5f;
 	float* thePredictOutPtr = predictOutput.ptr<float>(0);

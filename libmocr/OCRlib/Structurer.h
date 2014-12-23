@@ -23,12 +23,12 @@ public:
 		// Equals
 		for( int i = 0; i < leafs.size() - 1; i++ )
 		{
-			BlackObject curr = bound( &submat( img, leafs[ i ].getBound( ) ), 0 );
-			BlackObject next = bound( &submat( img, leafs[ i + 1 ].getBound( ) ), 0 );
-			shiftBounds( curr, next, leafs, i );
-
-			if( strs[i] == "-" && strs[i+1] == "-" )
+			if (strs[i] == "-" && strs[i + 1] == "-")
 			{
+				BlackObject curr = bound( &submat( img, leafs[ i ].getBound( ) ), 0 );
+				BlackObject next = bound( &submat( img, leafs[ i + 1 ].getBound( ) ), 0 );
+				shiftBounds( curr, next, leafs, i );
+
 				strs.erase( strs.begin() + (i + 1) );
 				leafs.erase( leafs.begin() + (i + 1) );
 				strs[i] = "=";
@@ -275,7 +275,7 @@ public:
 			{
 				std::string base;
 				for( int j = i; j < currRowBegin; j++ )
-					base += strs[i];
+					base += strs[j];
 
 				std::string pow;
 				for( int j = currRowBegin; j < nextRowBegin; j++ )

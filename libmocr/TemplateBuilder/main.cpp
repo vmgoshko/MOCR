@@ -18,7 +18,7 @@ Mat vectorToMat(vector< vector< int > >& v)
 	theResult.setTo(1);
 	for (int i = 0; i < v.size(); i++)
 		for (int j = 0; j < v[0].size(); j++)
-			theResult.at< unsigned char >(j, i) = v[i][j];
+			theResult.at< uchar >(j, i) = v[i][j];
 
 	return theResult;
 }
@@ -49,14 +49,17 @@ public:
 	
 		for (int i = 0; i < theTemplate.width; i++)
 			for (int j = 0; j < theTemplate.height; j++)
-				theWeights[i][j] = 2*weight(theObj.object, j, i);
+				theWeights[i][j] = weight(theObj.object, j, i);
 			
 		string theFileName = "templates/";
-		theFileName += name;
+		if (name != "/")
+			theFileName += name;
+		else
+			theFileName += "\\";
 		
 		ofstream out(theFileName.c_str());
 
-		out << theTemplate.height << ' ' << theTemplate.height << endl;
+		out << theTemplate.height << ' ' << theTemplate.width << endl;
 		for (int i = 0; i < theWeights.size(); i++)
 			for (int j = 0; j < theWeights[0].size(); j++)
 			{
@@ -70,9 +73,9 @@ private:
 
 	int weight(cv::Mat& image, int row, int col)
 	{
-		if (image.at<unsigned char>(row, col) == 0)
+		if (image.at<uchar>(row, col) == 0)
 			return 1;
-
+		
 		int theWidth = image.cols;
 		int theHeight = image.rows;
 		int min = max(theHeight, theWidth) * max(theHeight, theWidth);
@@ -80,7 +83,7 @@ private:
 		for (int i = 0; i < theHeight; i++)
 		for (int j = 0; j < theWidth; j++)
 		{
-			if (image.at< unsigned char >(i, j) == 0)
+			if (image.at< uchar >(i, j) == 0)
 			{
 				int distance = (i - row) * (i - row) + (j - col) * (j - col);
 
@@ -97,7 +100,7 @@ void main()
 {
 	ImagePreProccessor preProcessor;
 
-	Mat image = preProcessor.process("img/arev_traindata_fixed.png");
+	Mat image = preProcessor.process("img/iwona_traindata_fixed.png");
 	vector< BlackObject > mObjects = preProcessor.getBlackObjects();
 	vector< char* >* chars = getOutsVector();
 

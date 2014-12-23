@@ -18,7 +18,7 @@ cv::Mat submat( cv::Mat m, Bound b )
 	for( int i = 0; i < h; i++ )
 		for( int j = 0; j < w; j++ )
 		if (res.type() == CV_8UC1)
-			res.at<unsigned char>(i, j) = m.at<unsigned char>(i + b.t, j + b.l);
+			res.at<uchar>(i, j) = m.at<uchar>(i + b.t, j + b.l);
 		else
 			res.at<float>( i, j ) = m.at<float>( i + b.t, j + b.l );
 
@@ -58,7 +58,7 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		{
 			float px = -1;
 			if (m->type() == CV_8UC1)
-				px = m->at<unsigned char>(i, j);
+				px = m->at<uchar>(i, j);
 			else if (m->type() == CV_32FC1)
 				px = m->at<float>( i, j );
 
@@ -86,7 +86,7 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		{
 			float px = -1;
 			if (m->type() == CV_8UC1)
-				px = m->at<unsigned char>(i, j);
+				px = m->at<uchar>(i, j);
 			else if (m->type() == CV_32FC1)
 				px = m->at<float>(i, j);
 
@@ -114,7 +114,7 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		{
 			float px = -1;
 			if (m->type() == CV_8UC1)
-				px = m->at<unsigned char>(i, j);
+				px = m->at<uchar>(i, j);
 			else if (m->type() == CV_32FC1)
 				px = m->at<float>(i, j);
 
@@ -142,7 +142,7 @@ BlackObject bound( cv::Mat* m, float inObjectColor )
 		{
 			float px = -1;
 			if (m->type() == CV_8UC1)
-				px = m->at<unsigned char>(i, j);
+				px = m->at<uchar>(i, j);
 			else if (m->type() == CV_32FC1)
 				px = m->at<float>(i, j);
 
@@ -251,8 +251,8 @@ void invert(cv::Mat& inImage)
 	for (int i = 0; i < inImage.rows; i++)
 	for (int j = 0; j < inImage.cols; j++)
 	{
-		unsigned char newColor = ~inImage.at< unsigned char >(i, j);
-		inImage.at< unsigned char >(i, j) = newColor;
+		uchar newColor = ~inImage.at< uchar >(i, j);
+		inImage.at< uchar >(i, j) = newColor;
 	}
 }
 

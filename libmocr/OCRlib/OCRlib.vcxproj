@@ -89,7 +89,6 @@
     <ClInclude Include="NeuralNetworkTools.h" />
     <ClInclude Include="SkeletonBuilder.h" />
     <ClInclude Include="TemplateTools.h" />
-    <ClInclude Include="TesseractLeafRecognizer.h" />
     <ClInclude Include="PatternLeafRecognizer.h" />
     <ClInclude Include="Structurer.h" />
     <ClInclude Include="TwoStepsLeafRecognizer.h" />

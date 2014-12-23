@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <functional>
 
 
 //opencv includes
@@ -29,6 +30,11 @@ public:
 		int theMaxMatchIndex = -1;
 		int theMaxMatch = INT_MIN;
 
+		
+		float max = *max_element(inPossibleStrings.begin(), inPossibleStrings.end());
+		if ( max != 0 )
+			transform(inPossibleStrings.begin(), inPossibleStrings.end(), inPossibleStrings.begin(), std::bind2nd(std::divides<float>(), max));
+		
 		for (int i = 0; i < inPossibleStrings.size(); i++)
 		{
 			if (inPossibleStrings[i] != 0)
@@ -49,7 +55,10 @@ public:
 	{
 		int theMatch = 0;
 		std::string theFileName = "templates/";
-		theFileName += inName;
+		if (inName != "/")
+			theFileName += inName;
+		else
+			theFileName += "\\";
 
 		std::ifstream in(theFileName.c_str());
 		
@@ -67,8 +76,8 @@ public:
 		theWeights.assign(theWidth, theColumn);
 		
 		cv::Mat resizedImage = inObject.object;
-		scaleToHeight(resizedImage, theHeight);
-
+		//scaleToHeight(resizedImage, theHeight);
+		cv::resize(resizedImage, resizedImage, cv::Size(theWidth, theHeight));
 		ThresholdFilter theFilter;
 		theFilter.init(&resizedImage);
 		theFilter.doFilter();
@@ -83,10 +92,16 @@ public:
 		for (int i = 0; i < theWidth && i < resizedImage.cols; i++)
 		for (int j = 0; j < theHeight && i < resizedImage.rows; j++)
 			{
-				if (resizedImage.at<unsigned char>(j, i) == 0)
+				if (resizedImage.at<uchar>(j, i) == 0)
 					theMatch += theWeights[i][j];
 			}
 
+		cv::Mat img(theWeights[0].size(), theWeights.size(), CV_32FC1);
+		for (int i = 0; i < theWidth; i++)
+			for (int j = 0; j < theHeight && i < resizedImage.rows; j++)
+			{
+				img.at<float>(j, i) = theWeights[i][j];
+			}
 		return theMatch;
 	}
 	

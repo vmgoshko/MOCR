@@ -54,7 +54,7 @@ bool isVWL( Mat& m, int x, const Bound& bound )
 		float px = -1;
 
 		if (m.type() == CV_8UC1)
-			px = m.at<unsigned char>(i, x);
+			px = m.at<uchar>(i, x);
 		else if (m.type() == CV_32FC1)
 			px = m.at<float>(i, x);
 
@@ -72,7 +72,7 @@ bool isHWL( Mat& m, int y, const Bound& bound )
 	{
 		float px = -1;
 		if (m.type() == CV_8UC1)
-			px = m.at<unsigned char>(y, i);
+			px = m.at<uchar>(y, i);
 		else if (m.type() == CV_32FC1)
 			px = m.at<float>(y, i);
 

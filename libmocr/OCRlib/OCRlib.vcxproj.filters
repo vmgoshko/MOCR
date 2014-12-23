@@ -36,9 +36,6 @@
     <ClInclude Include="ComponentsTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TesseractLeafRecognizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LeafRecognizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
