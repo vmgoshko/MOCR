@@ -18,7 +18,7 @@ void main()
 	NeuralNetworkTools neuralNetTools;
 	ImagePreProccessor preProcessor;
 
-	cv::Mat image = preProcessor.process("img/iwona_traindata_fixed.png");
+	cv::Mat image = preProcessor.process("img/iwona_traindata.png");
 	
 	vector< BlackObject > mObjects = preProcessor.getBlackObjects();
 	neuralNetTools.setOutput(getOutsVector());

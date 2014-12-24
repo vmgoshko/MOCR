@@ -191,7 +191,7 @@ std::vector<char*>* getOutsVector()
 	chars->push_back( ")" );
 
 	chars->push_back( "+" );
-	//chars->push_back( "-" );
+	chars->push_back( "-" );
 	//chars->push_back( "*" );
 	chars->push_back( "/" );
 	
@@ -265,14 +265,4 @@ void LessAverageToNullFunctor::operator()(float& element)
 {
 	if (element < average)
 		element = 0;
-}
-
-AddForEach::AddForEach(float inOffset)
-	: offset(inOffset)
-{
-
-}
-void AddForEach::operator()(float& element)
-{
-	element += offset;
 }

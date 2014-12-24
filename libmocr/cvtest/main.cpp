@@ -20,7 +20,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 namespace {
-	const char* imagePath = "img/iwona_1.png";
+	const char* imagePath = "img/iwona_4.png";
 	const char* outPath = "result.txt";
 };
 

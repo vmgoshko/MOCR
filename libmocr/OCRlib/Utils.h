@@ -33,13 +33,4 @@ public:
 	void operator()(float& element);
 };
 
-class AddForEach
-{
-private:
-	float offset;
-public:
-	AddForEach(float inOffset);
-	void operator()(float& element);
-};
-
 #endif //UTILS_H

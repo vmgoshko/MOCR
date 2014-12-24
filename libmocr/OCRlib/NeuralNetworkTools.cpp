@@ -3,6 +3,7 @@
 #include "SkeletonBuilder.h"
 #include "Utils.h"
 #include <numeric>
+#include <functional>
 #include <iostream>
 
 using namespace std;
@@ -115,8 +116,8 @@ const char* NeuralNetworkTools::predict(BlackObject& obj)
 std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 {
 	obj = bound(&obj.object, 0);
-	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
 	copyMakeBorder(obj.object, obj.object, 1, 1, 1, 1, BORDER_CONSTANT, 255);
+	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
 
 	invert(obj.object);
 	SkeletonBuilder::thinningGuoHall(obj.object);
@@ -135,7 +136,7 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 	int thePredictOutSize = predictOutput.cols;
 
 	std::vector< float > theResult(thePredictOutPtr, thePredictOutPtr + thePredictOutSize);
-	for_each(theResult.begin(), theResult.end(), AddForEach(theOffset));
+	for_each(theResult.begin(), theResult.end(), std::bind2nd(std::plus<float>(), theOffset));
 	float average = std::accumulate(theResult.begin(), theResult.end(), 0.f) / theResult.size();
 	for_each(theResult.begin(), theResult.end(), LessAverageToNullFunctor(average));
 
