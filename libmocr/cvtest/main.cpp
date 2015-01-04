@@ -3,66 +3,15 @@
 #include <queue>
 #include <vector>
 #include <fstream>
-
-#include "ImagePreProccessor.h"
-#include "NeuralNetworkTools.h"
-#include "ComponentsTree.h"
-#include "Utils.h"
-#include "NeuralNetworkLeafRecognizer.h"
-#include "TwoStepsLeafRecognizer.h"
-#include "Structurer.h"
-#include "SkeletonBuilder.h"
-#include "Utils.h"
-
-
-#include <opencv2/core/core.hpp>
-#include <opencv/cv.h>
-#include <opencv2/highgui/highgui.hpp>
+#include "PyRecognize.h"
 
 namespace {
-	const char* imagePath = "img/iwona_4.png";
-	const char* outPath = "result.txt";
+	const char* imagePath = "img/iwona_traindata_fixed.png";
 };
-
-namespace {
-void showImage(const char* name, cv::Mat& img)
-	{
-		cv::namedWindow( name, CV_WINDOW_AUTOSIZE );
-		cv::imshow( name, img );
-	}
-};
-
-class NativeRecognizer
-{
-private:
-	const char* mImgPath;
-public:
-	NativeRecognizer( const char* inImagePath )
-		: mImgPath( inImagePath ) {};
-
-
-
-	std::string recognize()
-	{
-		ImagePreProccessor thePreProcessor;
-		TwoStepsLeafRecognizer theRecognizer;
-		Structurer theStructurer;
-		ComponentsTree theTree;
-		
-		cv::Mat theProcessedImage = thePreProcessor.process( mImgPath );
-		theTree.build(theProcessedImage);
-		std::vector< std::string > theLeafsStrs = theRecognizer.recognizeLeafs(&theTree);
-		std::string theResult = theStructurer.structure(theProcessedImage, theTree.getLeafs(), theLeafsStrs);
-
-		return theResult;
-	}
-};
-
 
 void main()
-{
-	NativeRecognizer theNativeRecognizer(imagePath);
-	std::cout << theNativeRecognizer.recognize() << std::endl;
+{	
+	std::cout << NativeRecognize(imagePath) << std::endl;
 	system("pause");
 	cvWaitKey( 0 );
 }

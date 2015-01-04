@@ -26,7 +26,7 @@ public:
 		}
 	}
 
-std::vector< std::string > recognizeLeafs( ComponentsTree* tree )
+std::vector< std::string > recognizeLeafs(ComponentsTree* tree, std::vector< std::vector< float > >* inPosibilities = NULL)
 {
 	std::vector< std::string > res;
 	std::vector< Component > leafs = tree->getLeafs();

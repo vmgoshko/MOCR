@@ -7,7 +7,7 @@
 class ComponentsTree;
 class LeafRecognizer 
 {
-	virtual std::vector< std::string > recognizeLeafs( ComponentsTree* tree ) = 0;
+	virtual std::vector< std::string > recognizeLeafs(ComponentsTree* tree, std::vector< std::vector< float > >* inPosibilities = NULL) = 0;
 };
 
 

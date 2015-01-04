@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/images/OCR_action_icon.png</file>
+        <file>Resources/images/Recognize.png</file>
+    </qresource>
+</RCC>

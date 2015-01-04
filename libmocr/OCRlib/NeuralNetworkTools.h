@@ -14,13 +14,17 @@ public:
 	void performeTraining();
 	void setOutput( std::vector<char*>* outs );
 	void addObject(BlackObject& obj, int outIndex);
-	const char* predict(BlackObject& object);
-	std::vector< float > getPossibleChars(BlackObject& object);
 	bool load();
 	bool save(const char* name);
+	const char* predict(BlackObject& object);
+	std::vector< float > getPossibleChars(BlackObject& object);
 
 private:
-	void fillCriteriaAndParams(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams);
+	void fillCriteriaAndParamsEps(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams);
+	void fillCriteriaAndParamsIter(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams);
+	void createNetwork();
+	void createInputOutput(cv::Mat& inInput, cv::Mat& inOutput);
+
 private:
 	const char* mcNetworkFile;
 	std::vector<char*>* mOutputStrings;

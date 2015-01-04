@@ -11,6 +11,9 @@
 #include "Utils.h"
 
 #define min( x, y ) (x) < (y) ? (x) : (y);
+#define PI (atan(1) * 4)
+#define radians(deg)  ((deg) * PI / 180)
+#define degrees(rad)  ((rad) * 180 / PI)
 
 class SkeletonBuilder
 {
@@ -377,6 +380,144 @@ public:
 		im &= ~marker;
 	}
 
+	struct Line
+	{
+		cv::Point start;
+		cv::Point end;
+
+		void setStart(int i, int j)
+		{
+			start.x = i;
+			start.y = j;
+		}
+
+		void setEnd(int i, int j)
+		{
+			end.x = i;
+			end.y = j;
+		}
+	};
+	
+	static void vectorize(cv::Mat& inSkeleton, float inObjectColor)
+	{
+		int xStart = -1;
+		int yStart = -1;
+		bool found = false;
+
+		for (int i = 0; i < inSkeleton.rows; i++)
+		{
+			for (int j = 0; j < inSkeleton.cols; j++)
+			{
+				uchar thePixel = inSkeleton.at<uchar>(i, j);
+
+				if (thePixel > 0 && neighboursCount(inSkeleton, inObjectColor, i, j) == 1)
+				{
+					xStart = i;
+					yStart = j;
+					inSkeleton.at< uchar >(i, j) -= 100;
+					found = true;
+					break;
+				}
+			}
+			if (found)
+				break;
+		}
+
+		std::vector< Line* > theLines = findLines(inSkeleton, inObjectColor, xStart, yStart);
+	}
+
+	static float angle(Line* inFirst, Line* inSecond)
+	{
+		float x1 = inFirst->end.x - inFirst->start.x;
+		float y1 = inFirst->end.y - inFirst->start.y;
+
+		float x2 = inSecond->end.x - inSecond->start.x;
+		float y2 = inSecond->end.y - inSecond->start.y;
+
+		float theCos = x1*x2 + y1*y2;
+		theCos /= sqrt(x1*x1 + y1*y1);
+		theCos /= sqrt(x2*x2 + y2*y2);
+		float theResult = degrees(acos(theCos));
+		
+		return theResult;
+	}
+
+	static std::vector< Line* > findLines(cv::Mat& inSkeleton, float inObjectColor, int xStart, int yStart)
+	{
+		bool isBreak = false;
+		Line* theLine = new Line;
+		theLine->setStart(xStart, yStart);
+		theLine->setEnd(xStart, yStart);
+		
+		for (int i = xStart - 1; i <= xStart + 1; i++)
+		{
+			for (int j = yStart - 1; j <= yStart + 1; j++)
+			{
+				if (i < 0 || j < 0 || i >= inSkeleton.rows || j >= inSkeleton.cols)
+					continue;
+
+				if (i == xStart && j == yStart)
+					continue;
+
+				if (inSkeleton.at< uchar >(i, j) == inObjectColor)
+				{
+					inSkeleton.at< uchar >(i, j) -= 100;
+					theLine->setEnd(i, j);
+					xStart = i;
+					yStart = j;
+					isBreak = true;
+					break;
+				}
+			}
+			if (isBreak)
+				break;
+		}
+
+		bool theLineEnd = false;
+		while (!theLineEnd)
+		{
+			isBreak = false;
+			for (int i = xStart - 1; i <= xStart + 1; i++)
+			{
+				for (int j = yStart - 1; j <= yStart + 1; j++)
+				{
+					if (i < 0 || j < 0 || i >= inSkeleton.rows || j >= inSkeleton.cols)
+						continue;
+
+					if (i == xStart && j == yStart)
+						continue;
+
+					if (inSkeleton.at< uchar >(i, j) == inObjectColor)
+					{
+						inSkeleton.at< uchar >(i, j) -= 100;
+						Line* theTemp = new Line;
+						theTemp->setStart(theLine->start.x, theLine->start.y);
+						theTemp->setEnd(i, j);
+
+						if (angle(theLine, theTemp) < 20)
+						{
+							theLine = theTemp;
+							xStart = i;
+							yStart = j;
+							isBreak = true;
+							break;
+						}
+						else
+						{
+							theLineEnd = true;
+							isBreak = true;
+							break;
+						}
+					}
+				}
+				if (isBreak)
+					break;
+			}
+		}
+
+		return std::vector< Line* >();
+	}
+
 	/**
 	* Function for thinning the given binary image
 	*
@@ -418,6 +559,7 @@ public:
 	*/
 	static std::vector< float > calculateCharacteristic( cv::Mat& inSkeleton, float inObjectColor )
 	{
+		vectorize(inSkeleton, inObjectColor);
 		cv::Mat theSavedSkeleton = inSkeleton;
 		cv::Mat theBoundedSkeleton = bound(&inSkeleton, inObjectColor).object;
 		
@@ -430,13 +572,12 @@ public:
 		int theMainDiagonalJoinCount = 0;
 		int theSideDiagonalJoinCount = 0;
 
-		std::vector< float > theCharacteristics( 9, 0 );
+		std::vector< float > theCharacteristics( 11, 0 );
 
 		for( int i = 0; i < theHeight; i++ )
 			for( int j = 0; j < theWidth; j++ )
 			{
 				uchar thePixel = theBoundedSkeleton.at< uchar >( i, j );
-				
 
 				if( thePixel > 0 )
 				{
@@ -473,6 +614,12 @@ public:
 
 					if (neighboursCount(theBoundedSkeleton, inObjectColor, i, j) == 1)
 						theCharacteristics[8]++;
+
+					if (neighboursCount(theBoundedSkeleton, inObjectColor, i, j) == 3)
+						theCharacteristics[9]++;
+
+					if (neighboursCount(theBoundedSkeleton, inObjectColor, i, j) == 4)
+						theCharacteristics[10]++;
 				}
 			}
 

@@ -18,7 +18,7 @@ public:
 	NeuralNetworkLeafRecognizer();
 	~NeuralNetworkLeafRecognizer();
 
-	std::vector< std::string > recognizeLeafs( ComponentsTree* tree );
+	std::vector< std::string > recognizeLeafs(ComponentsTree* tree, std::vector< std::vector< float > >* inPosibilities = NULL);
 private:
 	std::string recognizeLeaf( cv::Mat* leaf );
 private:

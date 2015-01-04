@@ -36,7 +36,7 @@ public:
 	void createTemplate(cv::Mat& image, char* name)
 	{
 		BlackObject theObj = bound(&image, 0);
-		scaleToHeight(theObj.object, Config::cNeuralNetworkImageHeight);
+		scaleToHeight(theObj.object, Config::cNeuralNetworkImageHeight / 2);
 		Template theTemplate;
 		theTemplate.height = theObj.object.rows;
 		theTemplate.width = theObj.object.cols;
@@ -100,7 +100,7 @@ void main()
 {
 	ImagePreProccessor preProcessor;
 
-	Mat image = preProcessor.process("img/iwona_traindata_fixed.png");
+	Mat image = preProcessor.process("img/iwona_traindata.png");
 	vector< BlackObject > mObjects = preProcessor.getBlackObjects();
 	vector< char* >* chars = getOutsVector();
 

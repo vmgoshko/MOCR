@@ -51,7 +51,7 @@ TesseractLeafRecognizer::~TesseractLeafRecognizer()
 	mApi->End();
 }
 
-std::vector<std::string> TesseractLeafRecognizer::recognizeLeafs( ComponentsTree* tree )
+std::vector<std::string> TesseractLeafRecognizer::recognizeLeafs(ComponentsTree* tree, std::vector< std::vector< float > >* inPosibilities)
 {
 	std::vector< Component > theLeafs = tree->getLeafs();
 	std::vector< std::string > theRes;

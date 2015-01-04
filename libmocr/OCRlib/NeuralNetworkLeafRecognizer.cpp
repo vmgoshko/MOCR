@@ -25,7 +25,7 @@ NeuralNetworkLeafRecognizer::~NeuralNetworkLeafRecognizer()
 	delete tools;
 }
 
-std::vector<std::string> NeuralNetworkLeafRecognizer::recognizeLeafs( ComponentsTree* tree )
+std::vector<std::string> NeuralNetworkLeafRecognizer::recognizeLeafs(ComponentsTree* tree, std::vector< std::vector< float > >* inPosibilities)
 {
 	std::vector< Component > theLeafs = tree->getLeafs();
 	std::vector< std::string > theRes;

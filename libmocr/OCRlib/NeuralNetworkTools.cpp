@@ -10,7 +10,7 @@ using namespace std;
 using namespace cv;
 
 NeuralNetworkTools::NeuralNetworkTools(void) 
-	: mcNetworkFile("../cvtest/nn")
+	: mcNetworkFile("nn")
 {
 }
 
@@ -24,11 +24,10 @@ NeuralNetworkTools::~NeuralNetworkTools(void)
 		delete mObjectOutputs[i];
 }
 
-void NeuralNetworkTools::fillCriteriaAndParams(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams)
+void NeuralNetworkTools::fillCriteriaAndParamsEps(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams)
 {
-	//criteria.max_iter = 200;
 	outCriteria.epsilon = 0.00001f;
-	outCriteria.type = /*CV_TERMCRIT_ITER |*/ CV_TERMCRIT_EPS;
+	outCriteria.type = CV_TERMCRIT_EPS;
 
 	outTrainParams.train_method = CvANN_MLP_TrainParams::BACKPROP;
 	outTrainParams.bp_dw_scale = 0.1f;
@@ -36,6 +35,16 @@ void NeuralNetworkTools::fillCriteriaAndParams(CvTermCriteria& outCriteria, CvAN
 	outTrainParams.term_crit = outCriteria;
 }
 
+void NeuralNetworkTools::fillCriteriaAndParamsIter(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams)
+{
+	outCriteria.max_iter = 1;
+	outCriteria.type = CV_TERMCRIT_ITER /*| CV_TERMCRIT_EPS*/;
+
+	outTrainParams.train_method = CvANN_MLP_TrainParams::BACKPROP;
+	outTrainParams.bp_dw_scale = 0.1f;
+	outTrainParams.bp_moment_scale = 0.1f;
+	outTrainParams.term_crit = outCriteria;
+}
 void NeuralNetworkTools::performeTraining()
 {
 	Mat inputs(mObjects.size(), mObjects[0]->size(), CV_32F);
@@ -44,32 +53,15 @@ void NeuralNetworkTools::performeTraining()
 	CvTermCriteria criteria;
 	CvANN_MLP_TrainParams params;
 	
-	fillCriteriaAndParams(criteria, params);
+	fillCriteriaAndParamsEps(criteria, params);
 
 	for (size_t i = 0; i < mObjects.size(); i++)
-	{
-		for (int j = 0; j < mObjects[i]->size(); j++)
-		{
-			float theCharacteristic = mObjects[i]->at(j);
-			inputs.at<float>(i, j) = theCharacteristic;
-		}
-	}
+		std::copy(mObjects[i]->begin(), mObjects[i]->end(), inputs.ptr<float>(i));
 
 	for (size_t i = 0; i < mObjectOutputs.size(); i++)
-	{
-		for (size_t j = 0; j < mOutputStrings->size(); j++)
-		{
-			outputs.at<float>(i, j) = mObjectOutputs[i]->at(j);
-		}
-	}
+		std::copy(mObjectOutputs[i]->begin(), mObjectOutputs[i]->end(), outputs.ptr<float>(i));
 
-	Mat layers( 1, 3, CV_32S );
-	layers.at<int>( 0, 0 ) = mObjects[0]->size();
-	layers.at<int>( 0, 1 ) = mObjects.size();
-	layers.at<int>( 0, 2 ) = mOutputStrings->size();
-
-	mNetwork.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1 );
-
+	createNetwork();
 	int theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params);
 	cout << "Training complete with " << theIterations << " iterations" << endl;
 }
@@ -112,7 +104,6 @@ const char* NeuralNetworkTools::predict(BlackObject& obj)
 	return mOutputStrings->at(theMaxIndex);
 }
 
-
 std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 {
 	obj = bound(&obj.object, 0);
@@ -136,16 +127,38 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 	int thePredictOutSize = predictOutput.cols;
 
 	std::vector< float > theResult(thePredictOutPtr, thePredictOutPtr + thePredictOutSize);
-	for_each(theResult.begin(), theResult.end(), std::bind2nd(std::plus<float>(), theOffset));
+	transform(theResult.begin(), theResult.end(), theResult.begin(), std::bind2nd(std::plus<float>(), theOffset));
 	float average = std::accumulate(theResult.begin(), theResult.end(), 0.f) / theResult.size();
 	for_each(theResult.begin(), theResult.end(), LessAverageToNullFunctor(average));
+
+	float theMaxValue = *max_element(theResult.begin(), theResult.end());
+	transform(theResult.begin(), theResult.end(), theResult.begin(), std::bind2nd(std::divides<float>(), theMaxValue));
 
 	return theResult;
 }
 
+void NeuralNetworkTools::createNetwork()
+{
+	Mat layers(1, 3, CV_32S);
+	layers.at<int>(0, 0) = mObjects[0]->size();
+	layers.at<int>(0, 1) = mObjects.size();
+	layers.at<int>(0, 2) = mOutputStrings->size();
+
+	mNetwork.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1);
+}
+
+void NeuralNetworkTools::createInputOutput(cv::Mat& inInput, cv::Mat& inOutput)
+{
+	for (size_t i = 0; i < mObjects.size(); i++)
+		std::copy(mObjects[i]->begin(), mObjects[i]->end(), inInput.ptr<float>(i));
+
+	for (size_t i = 0; i < mObjectOutputs.size(); i++)
+		std::copy(mObjectOutputs[i]->begin(), mObjectOutputs[i]->end(), inOutput.ptr<float>(i));
+}
+
 bool NeuralNetworkTools::load()
 {
-	mNetwork.load( "../cvtest/nn" );
+	mNetwork.load(mcNetworkFile);
 	return true;
 }
 

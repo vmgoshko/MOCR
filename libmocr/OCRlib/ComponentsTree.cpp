@@ -36,6 +36,21 @@ Component::Component( const Component& component )
 	this->str = component.str;
 }
 
+
+Component& Component::operator=(const Component& component)
+{
+	this->parent = component.parent;
+	this->bound = component.bound;
+	if (component.children)
+		this->children = new vector< Component>(*component.children);
+	else
+		this->children = NULL;
+
+	this->str = component.str;
+
+	return *this;
+}
+
 Component::~Component( )
 {
 	delete children;

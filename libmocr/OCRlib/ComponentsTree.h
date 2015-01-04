@@ -28,7 +28,7 @@ public:
 	const Component* getParent() { return parent; }
 	std::vector< Component >* getChildren() { return children; }
 
-	
+	Component& operator=(const Component& component);
 };
 
 class ComponentsTree 

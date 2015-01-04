@@ -1,5 +1,6 @@
 #ifndef TWO_STEPS_LEAF_RECGNIZER_H
 #define TWO_STEPS_LEAF_RECGNIZER_H
+
 #include <vector>
 
 #include "LeafRecognizer.h"
@@ -16,7 +17,7 @@
 class TwoStepsLeafRecognizer : public LeafRecognizer
 {
 public:
-	virtual std::vector< std::string > recognizeLeafs(ComponentsTree* tree)
+	virtual std::vector< std::string > recognizeLeafs(ComponentsTree* tree, std::vector< std::vector< float > >* inPosibilities = NULL)
 	{
 		std::vector< Component > theLeafs = tree->getLeafs();
 		std::vector< std::string > theResult( theLeafs.size() );
@@ -33,7 +34,8 @@ public:
 			BlackObject theObject;
 			theObject.object = theLeaf;
 			std::vector< float > thePossibleChars = theNeuralNetworkTools.getPossibleChars(theObject);
-
+			if( inPosibilities )
+				inPosibilities->push_back(thePossibleChars);
 			theObject.object = theLeaf;
 			std::string theChar = theTemplateTools.recognizePossibilities(thePossibleChars, theObject);
 			theResult[i] = theChar;
