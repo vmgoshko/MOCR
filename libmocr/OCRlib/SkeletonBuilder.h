@@ -240,89 +240,6 @@ public:
         }
 	}
 	
-	struct Node
-	{
-		int x;
-		int y;
-		Node* prev;
-
-		Node()
-		{
-			x = -1;
-			y = -1;
-		}
-
-		Node(int i, int j, Node* inPrev)
-		{
-			x = i;
-			y = j;
-			prev = inPrev;
-		}
-
-		bool isPrev(Node* node)
-		{
-			if (x == -1 && y == -1)
-				return false;
-			else if ((node->x == prev->x) && (node->y == prev->y))
-				return true;
-			else
-				return prev->isPrev(node);
-		}
-	};
-
-	static void cycleSearch(cv::Mat& image, int i, int j, int& count)
-	{
-		std::queue< Node* > theQueue;
-
-		theQueue.push(new Node(i, j, new Node()));
-
-		while (!theQueue.empty())
-		{
-			Node* theNode = theQueue.front();
-			theQueue.pop();
-			
-			if (theNode->x < 0 || theNode->x >= image.rows || theNode->y < 0 || theNode->y >= image.cols)
-				continue;
-
-			float thePx = image.at<float>(theNode->x, theNode->y);
-
-			if (thePx == 0)
-				continue;
-
-			if (thePx > 0 && thePx < 1)
-			{	
-				count++;
-				image.at<float>(theNode->x, theNode->y) -= 0.1f;
-				continue;
-			}
-
-			if (thePx == 1)
-				image.at<float>(theNode->x, theNode->y) -= 0.1f;
-			
-			bool isFound = false;
-			for (int k = theNode->x - 1; k <= theNode->x + 1; k++)
-			{
-				for (int l = theNode->y - 1; l <= theNode->y + 1; l++)
-				{
-					if (k < 0 || k >= image.rows || l < 0 || l >= image.cols || (k == theNode->x && l == theNode->y))
-						continue;
-
-					Node* n = new Node(k, l, theNode);
-					if (image.at<float>(k, l) && !theNode->isPrev(n))
-					{
-						theQueue.push(n);
-						isFound = true;
-						break;
-					}
-					else
-						delete n;
-				}
-				if (isFound)
-					break;
-			}
-		}
-	}
-
 	static int neighboursCount(cv::Mat& inSkeleton, float inObjectColor,int inRow, int inCol)
 	{
 		int theNeighboursCount = 0;
@@ -384,7 +301,7 @@ public:
 	{
 		cv::Point start;
 		cv::Point end;
-
+		
 		void setStart(int i, int j)
 		{
 			start.x = i;
@@ -398,10 +315,13 @@ public:
 		}
 	};
 	
-	static void vectorize(cv::Mat& inSkeleton, float inObjectColor)
+	static std::vector< Line* > vectorize(cv::Mat& inSkeleton, float inObjectColor)
 	{
 		int xStart = -1;
 		int yStart = -1;
+		
+		int sxStart = -1;
+		int syStart = -1;
 		bool found = false;
 
 		for (int i = 0; i < inSkeleton.rows; i++)
@@ -409,12 +329,17 @@ public:
 			for (int j = 0; j < inSkeleton.cols; j++)
 			{
 				uchar thePixel = inSkeleton.at<uchar>(i, j);
+				if (thePixel > 0 && sxStart == -1 && syStart == -1)
+				{
+					sxStart = i;
+					syStart = j;
+				}
 
 				if (thePixel > 0 && neighboursCount(inSkeleton, inObjectColor, i, j) == 1)
 				{
 					xStart = i;
 					yStart = j;
-					inSkeleton.at< uchar >(i, j) -= 100;
+					inSkeleton.at< uchar >(i, j) = 150;
 					found = true;
 					break;
 				}
@@ -423,99 +348,166 @@ public:
 				break;
 		}
 
-		std::vector< Line* > theLines = findLines(inSkeleton, inObjectColor, xStart, yStart);
-	}
-
-	static float angle(Line* inFirst, Line* inSecond)
-	{
-		float x1 = inFirst->end.x - inFirst->start.x;
-		float y1 = inFirst->end.y - inFirst->start.y;
-
-		float x2 = inSecond->end.x - inSecond->start.x;
-		float y2 = inSecond->end.y - inSecond->start.y;
-
-		float theCos = x1*x2 + y1*y2;
-		theCos /= sqrt(x1*x1 + y1*y1);
-		theCos /= sqrt(x2*x2 + y2*y2);
-		float theResult = degrees(acos(theCos));
-		
-		return theResult;
-	}
-
-	static std::vector< Line* > findLines(cv::Mat& inSkeleton, float inObjectColor, int xStart, int yStart)
-	{
-		bool isBreak = false;
-		Line* theLine = new Line;
-		theLine->setStart(xStart, yStart);
-		theLine->setEnd(xStart, yStart);
-		
-		for (int i = xStart - 1; i <= xStart + 1; i++)
+		if (!found)
 		{
-			for (int j = yStart - 1; j <= yStart + 1; j++)
+			xStart = sxStart;
+			yStart = syStart;
+		}
+
+		cv::Mat img(inSkeleton.rows, inSkeleton.cols, CV_32SC3);
+		img.setTo(0);
+		std::vector< Line* > theLines = findLines(inSkeleton, inObjectColor, xStart, yStart);
+		for (auto theLine : theLines)
+		{
+			inSkeleton.at<uchar>(theLine->start.x, theLine->start.y) = 255;
+			inSkeleton.at<uchar>(theLine->end.x, theLine->end.y) = 255;
+			cv::Point start;
+			cv::Point end;
+			start.x = theLine->start.y;
+			start.y = theLine->start.x;
+
+			end.x = theLine->end.y;
+			end.y = theLine->end.x;
+			line(img, start, end, cv::Scalar(255, 0, 0), 1);
+		}
+
+		return theLines;
+	}
+
+	static std::vector<cv::Point*> neighbours(cv::Mat& inSkeleton, float inObjectColor, int inRow, int inCol)
+	{
+		std::vector<cv::Point*> theResult;
+
+		for (int i = inRow - 1; i <= inRow + 1; i++)
+			for (int j = inCol - 1; j <= inCol + 1; j++)
 			{
 				if (i < 0 || j < 0 || i >= inSkeleton.rows || j >= inSkeleton.cols)
 					continue;
 
-				if (i == xStart && j == yStart)
+				if (i == inRow && j == inCol)
 					continue;
 
-				if (inSkeleton.at< uchar >(i, j) == inObjectColor)
-				{
-					inSkeleton.at< uchar >(i, j) -= 100;
-					theLine->setEnd(i, j);
-					xStart = i;
-					yStart = j;
-					isBreak = true;
-					break;
-				}
+				if (inSkeleton.at<uchar>(i, j) == inObjectColor)
+					theResult.push_back(new cv::Point(i, j));
 			}
-			if (isBreak)
-				break;
-		}
 
-		bool theLineEnd = false;
-		while (!theLineEnd)
+		return theResult;
+	}
+
+	static bool checkCurvature(std::vector<cv::Point*>& inLine)
+	{
+		Line theLine;
+		theLine.start = **inLine.begin();
+		theLine.end = **(inLine.end() - 1);
+
+		float A = theLine.start.y - theLine.end.y;
+		float B = theLine.end.x - theLine.start.x;
+		float C = theLine.start.x*theLine.end.y - theLine.end.x*theLine.start.y;
+
+		float theMaxDistance = 0;
+		for (auto pt = inLine.begin() + 1; pt < inLine.end() - 1; pt++)
 		{
-			isBreak = false;
-			for (int i = xStart - 1; i <= xStart + 1; i++)
+			cv::Point thePt = **pt;
+
+			float theDistance = abs(A * thePt.x + B * thePt.y + C);
+			theDistance /= sqrt(A*A + B*B);
+
+			if (theDistance > 5.f)
+				return false;
+		}
+
+		return true;
+	}
+
+	static std::vector< Line* > findLines(cv::Mat& inSkeleton, float inObjectColor, int xStart, int yStart)
+	{
+		std::vector<cv::Point*> theLine;
+		std::vector< Line* > theResult;
+		std::queue< cv::Point*> theCrossPoints;
+
+		theLine.push_back(new cv::Point(xStart, yStart));
+
+		int x = xStart;
+		int y = yStart;
+		while ( true )
+		{
+			std::vector<cv::Point*> theNeighbours = neighbours(inSkeleton, inObjectColor, x, y);
+
+			if (theNeighbours.empty() && theCrossPoints.empty())
+				break;
+
+			if (theNeighbours.empty())
 			{
-				for (int j = yStart - 1; j <= yStart + 1; j++)
+				cv::Point thePoint = *theCrossPoints.front();
+				std::vector< Line* > theCrossPtLines = findLines(inSkeleton, inObjectColor, thePoint.x, thePoint.y);
+				theResult.insert(theResult.end(), theCrossPtLines.begin(), theCrossPtLines.end());
+
+				if (neighboursCount(inSkeleton, inObjectColor, thePoint.x, thePoint.y) == 0)
 				{
-					if (i < 0 || j < 0 || i >= inSkeleton.rows || j >= inSkeleton.cols)
-						continue;
-
-					if (i == xStart && j == yStart)
-						continue;
-
-					if (inSkeleton.at< uchar >(i, j) == inObjectColor)
-					{
-						inSkeleton.at< uchar >(i, j) -= 100;
-						Line* theTemp = new Line;
-						theTemp->setStart(theLine->start.x, theLine->start.y);
-						theTemp->setEnd(i, j);
-
-						if (angle(theLine, theTemp) < 20)
-						{
-							theLine = theTemp;
-							xStart = i;
-							yStart = j;
-							isBreak = true;
-							break;
-						}
-						else
-						{
-							theLineEnd = true;
-							isBreak = true;
-							break;
-						}
-					}
+					theCrossPoints.pop();
+					continue;
 				}
-				if (isBreak)
-					break;
+			}
+
+			auto thePoint = theNeighbours[0];
+
+			inSkeleton.at<uchar>(thePoint->x, thePoint->y) = 150;
+			theLine.push_back(thePoint);
+			
+			if (neighboursCount(inSkeleton, inObjectColor, thePoint->x, thePoint->y) > 1)
+			{
+			//	inSkeleton.at<uchar>(thePoint->x, thePoint->y) = 255;
+				theCrossPoints.push(new cv::Point(thePoint->x, thePoint->y));
+
+				Line* theNewLine = new Line();
+				theNewLine->start = **theLine.begin();
+				theNewLine->end = **(theLine.end() - 1);
+
+				theResult.push_back(theNewLine);
+				theLine.clear();
+				x = theNewLine->end.x;
+				y = theNewLine->end.y;
+
+				theLine.push_back(new cv::Point(theNewLine->end.x, theNewLine->end.y));
+				continue;
+			}
+			else if (neighboursCount(inSkeleton, inObjectColor, thePoint->x, thePoint->y) == 0)
+			{
+				Line* theNewLine = new Line();
+				theNewLine->start = **theLine.begin();
+				theNewLine->end = **(theLine.end() - 1);
+
+				theResult.push_back(theNewLine);
+				theLine.clear();
+				x = theNewLine->end.x;
+				y = theNewLine->end.y;
+
+				theLine.push_back(new cv::Point(theNewLine->end.x, theNewLine->end.y));
+				continue;
+			}
+			
+			if (!checkCurvature(theLine))
+			{
+				inSkeleton.at<uchar>(thePoint->x, thePoint->y) = 255;
+				theLine.pop_back();
+				Line* theNewLine = new Line();
+				theNewLine->start = **theLine.begin();
+				theNewLine->end = **(theLine.end() - 1);
+				
+				theResult.push_back(theNewLine);
+				theLine.clear();
+				x = theNewLine->end.x;
+				y = theNewLine->end.y;
+				theLine.push_back(new cv::Point(theNewLine->end.x, theNewLine->end.y));
+			}
+			else
+			{
+				x = thePoint->x;
+				y = thePoint->y;
 			}
 		}
 
-		return std::vector< Line* >();
+		return theResult;
 	}
 
 	/**
@@ -559,9 +551,10 @@ public:
 	*/
 	static std::vector< float > calculateCharacteristic( cv::Mat& inSkeleton, float inObjectColor )
 	{
-		vectorize(inSkeleton, inObjectColor);
 		cv::Mat theSavedSkeleton = inSkeleton;
 		cv::Mat theBoundedSkeleton = bound(&inSkeleton, inObjectColor).object;
+
+		vectorize(inSkeleton, inObjectColor);
 		
 		int theHeight = theBoundedSkeleton.rows;
 		int theWidth = theBoundedSkeleton.cols;
