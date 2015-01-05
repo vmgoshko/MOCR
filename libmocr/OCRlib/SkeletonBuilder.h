@@ -394,8 +394,19 @@ public:
 		return theResult;
 	}
 
+	static float distance(float A, float B, float C, cv::Point* pt)
+	{
+		float theDistance = abs(A * pt->x + B * pt->y + C);
+		theDistance /= sqrt(A*A + B*B);
+
+		return theDistance;
+	}
+
 	static bool checkCurvature(std::vector<cv::Point*>& inLine)
 	{
+		if (inLine.size() < 3)
+			return true;
+
 		Line theLine;
 		theLine.start = **inLine.begin();
 		theLine.end = **(inLine.end() - 1);
@@ -405,18 +416,20 @@ public:
 		float C = theLine.start.x*theLine.end.y - theLine.end.x*theLine.start.y;
 
 		float theMaxDistance = 0;
-		for (auto pt = inLine.begin() + 1; pt < inLine.end() - 1; pt++)
+	/*	for (auto pt = inLine.begin() + 1; pt < inLine.end() - 1; pt++)
 		{
 			cv::Point thePt = **pt;
-
-			float theDistance = abs(A * thePt.x + B * thePt.y + C);
-			theDistance /= sqrt(A*A + B*B);
-
-			if (theDistance > 5.f)
+			
+			if (distance( A, B, C, *pt ) > 7.f)
 				return false;
 		}
 
 		return true;
+		*/
+
+		float theDistance = distance(A, B, C, inLine[inLine.size() / 2]);
+
+		return theDistance < 10.f;
 	}
 
 	static std::vector< Line* > findLines(cv::Mat& inSkeleton, float inObjectColor, int xStart, int yStart)
