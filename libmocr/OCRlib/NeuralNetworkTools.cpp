@@ -74,16 +74,17 @@ void showImage( const char* name, cv::Mat& img )
 
 void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex )
 {
+	SkeletonBuilder theSkeletonBuilder;
 	obj = bound(&obj.object, 0);
 	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
 	copyMakeBorder(obj.object, obj.object, 1, 1, 1, 1, BORDER_CONSTANT, 255);
 	
 	//create input
 	invert( obj.object );
-	SkeletonBuilder::thinningGuoHall(obj.object);
+	theSkeletonBuilder.thinningGuoHall(obj.object);
 	obj = bound(&obj.object, 255);
 
-	std::vector< float >* theCharacteristics = new std::vector< float >( SkeletonBuilder::calculateCharacteristic( obj.object, 255 ) );
+	std::vector< float >* theCharacteristics = new std::vector< float >(theSkeletonBuilder.calculateCharacteristic(obj.object, 255));
 	mObjects.push_back( theCharacteristics );
 
 	//create output
@@ -106,14 +107,16 @@ const char* NeuralNetworkTools::predict(BlackObject& obj)
 
 std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 {
+	SkeletonBuilder theSkeletonBuilder;
+
 	obj = bound(&obj.object, 0);
 	copyMakeBorder(obj.object, obj.object, 1, 1, 1, 1, BORDER_CONSTANT, 255);
 	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
 
 	invert(obj.object);
-	SkeletonBuilder::thinningGuoHall(obj.object);
+	theSkeletonBuilder.thinningGuoHall(obj.object);
 	obj = bound(&obj.object, 255);
-	std::vector< float > theCharacteristics = SkeletonBuilder::calculateCharacteristic(obj.object, 255);
+	std::vector< float > theCharacteristics = theSkeletonBuilder.calculateCharacteristic(obj.object, 255);
 
 	Mat input(1, theCharacteristics.size(), CV_32F);
 	Mat predictOutput = Mat::zeros(1, mOutputStrings->size(), CV_32F);
