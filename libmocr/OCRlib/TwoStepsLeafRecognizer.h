@@ -33,12 +33,13 @@ public:
 			cv::Mat theLeaf = submat(tree->getImage(), theLeafs[i].getBound());
 			BlackObject theObject;
 			theObject.object = theLeaf;
-			std::vector< float > thePossibleChars = theNeuralNetworkTools.getPossibleChars(theObject);
+			/*std::vector< float > thePossibleChars = theNeuralNetworkTools.getPossibleChars(theObject);
 			if( inPosibilities )
 				inPosibilities->push_back(thePossibleChars);
 			theObject.object = theLeaf;
 			std::string theChar = theTemplateTools.recognizePossibilities(thePossibleChars, theObject);
-			theResult[i] = theChar;
+			theResult[i] = theChar;*/
+			theResult[i] = theNeuralNetworkTools.predict(theObject);
 		}
 	
 		return theResult;

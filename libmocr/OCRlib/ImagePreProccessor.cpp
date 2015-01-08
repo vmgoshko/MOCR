@@ -1,16 +1,11 @@
 #include "ImagePreProccessor.h"
 #include "Filters.h"
+#include "Defs.h"
 #include <queue>
 
 using namespace cv;
 using namespace std;
 
-#define MIN_ASSIGN(X,Y) if( (X) > (Y) ) \
-							(X) = (Y);
-
-
-#define MAX_ASSIGN(X,Y) if( (X) < (Y) ) \
-							(X) = (Y);
 
 
 static void showImage(const char* name, cv::Mat& img)

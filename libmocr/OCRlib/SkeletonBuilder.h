@@ -59,66 +59,86 @@ struct Line
 	}
 };
 
+struct Node
+{
+	cv::Point* coords;
+	std::vector< Node* > neighbours;
+	bool drawed = false;
+	bool looked = false;
+	bool deleted = false;
+
+	void addNeighbour(Node* pt)
+	{
+		neighbours.push_back(pt);
+	}
+
+	void addNeighbours(std::vector<Node*> inNeighbours)
+	{
+		for (int i = 0; i < inNeighbours.size(); i++)
+		{
+			if (inNeighbours[i] != this)
+				neighbours.push_back(inNeighbours[i]);
+		}
+	}
+
+	void erase(Node* inNode)
+	{
+		auto theNode = std::find(neighbours.begin(), neighbours.end(), inNode);
+		if( theNode != neighbours.end() )
+			neighbours.erase(theNode);
+	}
+
+	void clearNeighbours()
+	{
+		for (int i = 0; i < neighbours.size(); i++)
+		{
+			neighbours[i]->erase(this);
+		}
+	}
+
+	void replaceThisByNode(Node* inNode)
+	{
+		for (int i = 0; i < neighbours.size(); i++)
+		{
+			if (neighbours[i] != inNode)
+			{
+				neighbours[i]->erase(this);
+				neighbours[i]->addNeighbour(inNode);
+			}
+		}
+	}
+};
+
 class SkeletonBuilder
 {
+
+public:
+	~SkeletonBuilder();
+	void thinningGuoHall(cv::Mat& im);
+	std::vector< float > calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor);
+	std::vector< float > calculateCharacteristicVectorize(cv::Mat& inSkeleton, float inObjectColor);
+
 private:
 	void ThinSubiteration1(cv::Mat & pSrc, cv::Mat & pDst);
 	void ThinSubiteration2(cv::Mat & pSrc, cv::Mat & pDst);
-	/**
-	* Perform one thinning iteration.
-	* Normally you wouldn't call this function directly from your code.
-	*
-	* @param  im    Binary image with range = 0-1
-	* @param  iter  0=even, 1=odd
-	*/
 	void thinningIteration(cv::Mat& im, int iter);
-
-	/**
-	* Function for thinning the given binary image
-	*
-	* @param  im  Binary image with range = 0-255
-	*/
 	void thinning(cv::Mat& im);
 	void skeleton(cv::Mat & inputarray, cv::Mat & outputarray);
-	int neighboursCount(cv::Mat& inSkeleton, float inObjectColor, int inRow, int inCol);
-
-	/**
-	* Perform one thinning iteration.
-	* Normally you wouldn't call this function directly from your code.
-	*
-	* @param  im    Binary image with range = 0-1
-	* @param  iter  0=even, 1=odd
-	*/
 	void thinningGuoHallIteration(cv::Mat& im, int iter);
-	std::vector< Line* > vectorize(cv::Mat& inSkeleton, float inObjectColor);
-	cv::Point* neighbour(cv::Mat& inSkeleton, float inObjectColor, cv::Point*** inPoints, int inRow, int inCol);
+	std::vector< Line* > vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::Mat& outImg);
+	cv::Point* neighbour(cv::Mat& inSkeleton, float inObjectColor, std::vector<cv::Point*>& theLine, int inRow, int inCol);
 	float distance(float A, float B, float C, cv::Point* pt);
 	bool checkCurvature(std::vector<cv::Point*>& inLine);
-	cv::Point* getPoint(cv::Point*** inPoints, int x, int y);
-	std::vector< Line* > findLines(cv::Mat& inSkeleton, float inObjectColor, int xStart, int yStart, cv::Point*** inPoints);
+	cv::Point* getPoint(int x, int y);
+	Node* getNode(int x, int y);
+	int neighboursCount(cv::Mat& inSkeleton, float inObjectColor, int inRow, int inCol);
+	std::vector< Line* > findLines(cv::Mat& inSkeleton, float inObjectColor, int xStart, int yStart);
 
-public:
-	/**
-	* Function for thinning the given binary image
-	*
-	* @param  im  Binary image with range = 0-255
-	*/
-	void thinningGuoHall(cv::Mat& im);
-
-	/*
-		Функция вычисляет характеристики скилета изображения:
-		1. Центр тяжести относительно оси OX
-		2. Центр тяжести относительно оси OY
-		3. Среднеквадратичное отклонение от центра тяжести отностиельно OX
-		4. Среднеквадратичное отклонение от центра тяжести отностиельно OY
-					
-		5. Количество скелетных точек, связанных с соседними по горизонтали, к общему количеству скелетных точек
-		6. Количество скелетных точек, связанных с соседними по вертикали, к общему количеству скелетных точек
-		7. Количество скелетных точек, связанных с соседними по главной диагонали, к общему количеству скелетных точек
-		8. Количество скелетных точек, связанных с соседними по обратной диагонали, к общему количеству скелетных точек
-	*/
-	std::vector< float > calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor);
-	std::vector< float > calculateCharacteristicVectorize(cv::Mat& inSkeleton, float inObjectColor);
+	void createNodesPoints(int rows, int cols);
+	void deleteNodesPoints();
+private:
+	std::vector<std::vector<Node*>> mNodes;
+	std::vector<std::vector<cv::Point*>> mPoints;
 };
 
 #endif //SKELETON_BUILDER_H
