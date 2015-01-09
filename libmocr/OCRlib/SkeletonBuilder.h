@@ -65,7 +65,6 @@ struct Node
 	std::vector< Node* > neighbours;
 	bool drawed = false;
 	bool looked = false;
-	bool deleted = false;
 
 	void addNeighbour(Node* pt)
 	{
@@ -96,13 +95,13 @@ struct Node
 		}
 	}
 
-	void replaceThisByNode(Node* inNode)
+	void replaceThisByNode(Node* src, Node* inNode)
 	{
 		for (int i = 0; i < neighbours.size(); i++)
 		{
 			if (neighbours[i] != inNode)
 			{
-				neighbours[i]->erase(this);
+				neighbours[i]->erase(src);
 				neighbours[i]->addNeighbour(inNode);
 			}
 		}
@@ -128,7 +127,7 @@ private:
 	std::vector< Line* > vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::Mat& outImg);
 	cv::Point* neighbour(cv::Mat& inSkeleton, float inObjectColor, std::vector<cv::Point*>& theLine, int inRow, int inCol);
 	float distance(float A, float B, float C, cv::Point* pt);
-	bool checkCurvature(std::vector<cv::Point*>& inLine);
+	bool isAllowableLine(std::vector<cv::Point*>& inLine);
 	cv::Point* getPoint(int x, int y);
 	Node* getNode(int x, int y);
 	int neighboursCount(cv::Mat& inSkeleton, float inObjectColor, int inRow, int inCol);
@@ -136,9 +135,14 @@ private:
 
 	void createNodesPoints(int rows, int cols);
 	void deleteNodesPoints();
+
+	Node* createGraph( std::vector< Line*> inLines);
+	void findStartPixel(cv::Mat& inSkeleton, float inObjectColor, int& outRow, int& outCol);
+	Line* newLine(std::vector< cv::Point* >& inLine, int& outNewX, int& outNewY);
 private:
 	std::vector<std::vector<Node*>> mNodes;
 	std::vector<std::vector<cv::Point*>> mPoints;
+	std::queue< cv::Point* > mCrossPoints;
 };
 
 #endif //SKELETON_BUILDER_H

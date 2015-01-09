@@ -1,7 +1,9 @@
 #include "SkeletonBuilder.h"
 
 #define min( x, y ) (x) < (y) ? (x) : (y);
-
+#define MAX_DISTANCE 5
+#define MAX_LINE_LENGTH 2*Config::cNeuralNetworkImageHeight
+#define NEIGHBOURS_DISTANCE 3
 
 SkeletonBuilder::~SkeletonBuilder()
 {
@@ -285,12 +287,27 @@ void SkeletonBuilder::thinningGuoHallIteration(cv::Mat& im, int iter)
 
 bool isNeighbours(cv::Point* f, cv::Point* s)
 {
-	return abs(f->x - s->x) <= 1 && abs(f->y - s->y) <= 1 && (abs(f->x - s->x) + abs(f->y - s->y) != 0);
+	return abs(f->x - s->x) <= NEIGHBOURS_DISTANCE && abs(f->y - s->y) <= NEIGHBOURS_DISTANCE && (abs(f->x - s->x) + abs(f->y - s->y) != 0);
 }
 
 void deepSearch(Node* inNode)
 {
 	inNode->looked = true;
+
+
+	for (int i = 0; i < inNode->neighbours.size(); i++)
+	{
+		Node* theNode = inNode->neighbours[i];
+		if (isNeighbours(inNode->coords, theNode->coords))
+		{
+			inNode->erase(theNode);
+			theNode->erase(inNode);
+			theNode->replaceThisByNode(theNode, inNode);
+			inNode->addNeighbours(theNode->neighbours);
+			--i;
+		}
+	}
+
 	for (int i = 0; i < inNode->neighbours.size(); i++)
 	{
 		Node* theNode = inNode->neighbours[i];
@@ -300,18 +317,6 @@ void deepSearch(Node* inNode)
 		}
 	}
 
-	for (int i = 0; i < inNode->neighbours.size(); i++)
-	{
-		Node* theNode = inNode->neighbours[i];
-		if (isNeighbours(inNode->coords, theNode->coords))
-		{
-			inNode->erase(theNode);
-			theNode->erase(inNode);
-			theNode->replaceThisByNode(inNode);
-			inNode->addNeighbours(theNode->neighbours);
-			--i;
-		}
-	}
 }
 
 void deepDraw(Node* inNode, cv::Mat& outImg)
@@ -358,11 +363,31 @@ void SkeletonBuilder::deleteNodesPoints()
 	}
 }
 
-std::vector< Line* > SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::Mat& outImg)
+
+Node* SkeletonBuilder::createGraph(std::vector< Line*> inLines)
 {
-	createNodesPoints(inSkeleton.rows, inSkeleton.cols);
-	int xStart = -1;
-	int yStart = -1;
+	for (auto theLine : inLines)
+	{
+		Node* theNode = getNode(theLine->start->x, theLine->start->y);
+		theNode->coords = theLine->start;
+
+		Node* theChildNode = getNode(theLine->end->x, theLine->end->y);
+		theChildNode->coords = theLine->end;
+
+		theNode->addNeighbour(theChildNode);
+		theChildNode->addNeighbour(theNode);
+	}
+
+	Node* theNode = getNode(inLines[0]->start->x, inLines[0]->start->y);
+
+	return theNode;
+}
+
+
+void SkeletonBuilder::findStartPixel(cv::Mat& inSkeleton, float inObjectColor, int& outRow, int& outCol)
+{
+	outRow = -1;
+	outCol = -1;
 
 	int sxStart = -1;
 	int syStart = -1;
@@ -381,8 +406,8 @@ std::vector< Line* > SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObj
 
 			if (thePixel > 0 && neighboursCount(inSkeleton, inObjectColor, i, j) == 1)
 			{
-				xStart = i;
-				yStart = j;
+				outRow = i;
+				outCol = j;
 				inSkeleton.at< uchar >(i, j) = 150;
 				found = true;
 				break;
@@ -394,31 +419,26 @@ std::vector< Line* > SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObj
 
 	if (!found)
 	{
-		xStart = sxStart;
-		yStart = syStart;
+		outRow = sxStart;
+		outCol = syStart;
 	}
+}
 
+std::vector< Line* > SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::Mat& outImg)
+{
+	createNodesPoints(inSkeleton.rows, inSkeleton.cols);
+	int xStart;
+	int yStart;
+
+	findStartPixel(inSkeleton, inObjectColor, xStart, yStart);
 	outImg = cv::Mat(inSkeleton.rows, inSkeleton.cols, CV_32SC3);
 	outImg.setTo(0);
-	std::vector< Line* > theLines = findLines(inSkeleton, inObjectColor, xStart, yStart);
-
-	for (auto theLine : theLines)
-	{
-		Node* theNode = getNode(theLine->start->x, theLine->start->y);
-		theNode->coords = theLine->start;
-
-		Node* theChildNode = getNode(theLine->end->x, theLine->end->y);
-		theChildNode->coords = theLine->end;
-
-		theNode->addNeighbour(theChildNode);
-		theChildNode->addNeighbour(theNode);
-	}
-
-	Node* theNode = getNode(theLines[0]->start->x, theLines[0]->start->y);
-	auto img = cv::Mat(inSkeleton.rows, inSkeleton.cols, CV_32SC3);
-	deepSearch(theNode);
 	
-	deepDraw(theNode, img);
+	std::vector< Line* > theLines = findLines(inSkeleton, inObjectColor, xStart, yStart);
+	
+	Node* theRoot = createGraph(theLines);
+	deepSearch(theRoot);
+	deepDraw(theRoot, outImg);
 
 	return theLines;
 }
@@ -435,8 +455,8 @@ cv::Point* SkeletonBuilder::neighbour(cv::Mat& inSkeleton, float inObjectColor, 
 
 			if (i == inRow && j == inCol)
 				continue;
-
-			if (inSkeleton.at<uchar>(i, j) == inObjectColor)
+			
+			if (inSkeleton.at<uchar>(i, j) == inObjectColor )
 			{
 				cv::Point* thePoint = getPoint(i, j);
 				return thePoint;
@@ -454,7 +474,7 @@ float SkeletonBuilder::distance(float A, float B, float C, cv::Point* pt)
 	return theDistance;
 }
 
-bool SkeletonBuilder::checkCurvature(std::vector<cv::Point*>& inLine)
+bool SkeletonBuilder::isAllowableLine(std::vector<cv::Point*>& inLine)
 {
 	if (inLine.size() < 3)
 		return true;
@@ -469,7 +489,7 @@ bool SkeletonBuilder::checkCurvature(std::vector<cv::Point*>& inLine)
 
 	float theDistance = distance(A, B, C, inLine[inLine.size() / 2]);
 
-	return theDistance < 5;
+	return theDistance < MAX_DISTANCE && inLine.size() <= MAX_LINE_LENGTH;
 }
 
 cv::Point* SkeletonBuilder::getPoint(int x, int y)
@@ -492,11 +512,27 @@ Node* SkeletonBuilder::getNode(int x, int y)
 	return mNodes[x][y];
 }
 
+
+Line* SkeletonBuilder::newLine(std::vector< cv::Point* >& inLine, int& outNewX, int& outNewY)
+{
+	Line* theNewLine = new Line();
+	theNewLine->start = *inLine.begin();
+	theNewLine->end = *(inLine.end() - 1);
+
+	inLine.clear();
+
+	outNewX = theNewLine->end->x;
+	outNewY = theNewLine->end->y;
+
+	inLine.push_back(getPoint(theNewLine->end->x, theNewLine->end->y));
+	return theNewLine;
+}
+
 std::vector< Line* > SkeletonBuilder::findLines(cv::Mat& inSkeleton, float inObjectColor, int xStart, int yStart)
 {
 	std::vector<cv::Point*> theLine;
 	std::vector< Line* > theResult;
-	std::queue< cv::Point*> theCrossPoints;
+	std::queue< cv::Point*> mCrossPoints;
 
 	theLine.push_back(getPoint(xStart, yStart));
 
@@ -505,19 +541,19 @@ std::vector< Line* > SkeletonBuilder::findLines(cv::Mat& inSkeleton, float inObj
 	while (true)
 	{
 		cv::Point* theNeighbour = neighbour(inSkeleton, inObjectColor, theLine, x, y);
-
-		if (!theNeighbour && theCrossPoints.empty())
+		
+		if (!theNeighbour && mCrossPoints.empty())
 			break;
 
 		if (!theNeighbour)
 		{
-			cv::Point thePoint = *theCrossPoints.front();
+			cv::Point thePoint = *mCrossPoints.front();
 			std::vector< Line* > theCrossPtLines = findLines(inSkeleton, inObjectColor, thePoint.x, thePoint.y);
 			theResult.insert(theResult.end(), theCrossPtLines.begin(), theCrossPtLines.end());
 
 			if (neighboursCount(inSkeleton, inObjectColor, thePoint.x, thePoint.y) == 0)
 			{
-				theCrossPoints.pop();
+				mCrossPoints.pop();
 				continue;
 			}
 		}
@@ -527,48 +563,43 @@ std::vector< Line* > SkeletonBuilder::findLines(cv::Mat& inSkeleton, float inObj
 
 		if (neighboursCount(inSkeleton, inObjectColor, theNeighbour->x, theNeighbour->y) > 1)
 		{
-			theCrossPoints.push(getPoint(theNeighbour->x, theNeighbour->y));
+			inSkeleton.at<uchar>(theNeighbour->x, theNeighbour->y) = 100; 
+			
+			mCrossPoints.push(getPoint(theNeighbour->x, theNeighbour->y));
 
-			Line* theNewLine = new Line();
-			theNewLine->start = *theLine.begin();
-			theNewLine->end = *(theLine.end() - 1);
-
+			Line* theNewLine = newLine(theLine, x, y);
 			theResult.push_back(theNewLine);
-			theLine.clear();
-			x = theNewLine->end->x;
-			y = theNewLine->end->y;
-
-			theLine.push_back(getPoint(theNewLine->end->x, theNewLine->end->y));
 			continue;
 		}
 		else if (neighboursCount(inSkeleton, inObjectColor, theNeighbour->x, theNeighbour->y) == 0)
 		{
-			Line* theNewLine = new Line();
-			theNewLine->start = *theLine.begin();
-			theNewLine->end = *(theLine.end() - 1);
+			if (theNeighbour->x == 22 && theNeighbour->y == 57)
+				int a = 0;
 
-			theResult.push_back(theNewLine);
-			theLine.clear();
-			x = theNewLine->end->x;
-			y = theNewLine->end->y;
+			theNeighbour = neighbour(inSkeleton, 100, theLine, theNeighbour->x, theNeighbour->y);
+			if (!theNeighbour)
+			{
 
-			theLine.push_back(getPoint(theNewLine->end->x, theNewLine->end->y));
-			continue;
+				Line* theNewLine = newLine(theLine, x, y);
+				theResult.push_back(theNewLine);
+				continue;
+			}
+			else
+			{
+				theLine.push_back(theNeighbour);
+	
+				Line* theNewLine = newLine(theLine, x, y);
+				theResult.push_back(theNewLine);
+			}
 		}
 
-		if (!checkCurvature(theLine))
+		if (!isAllowableLine(theLine))
 		{
 			inSkeleton.at<uchar>(theNeighbour->x, theNeighbour->y) = 255;
 			theLine.pop_back();
-			Line* theNewLine = new Line();
-			theNewLine->start = *theLine.begin();
-			theNewLine->end = *(theLine.end() - 1);
 
+			Line* theNewLine = newLine(theLine, x, y);
 			theResult.push_back(theNewLine);
-			theLine.clear();
-			x = theNewLine->end->x;
-			y = theNewLine->end->y;
-			theLine.push_back(getPoint(theNewLine->end->x, theNewLine->end->y));
 		}
 		else
 		{
