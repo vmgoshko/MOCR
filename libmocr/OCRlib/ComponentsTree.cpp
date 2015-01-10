@@ -253,7 +253,6 @@ void ComponentsTree::show( Component* component )
 
 		Mat save = submat( m, component->getBound() );
 
-		//SkeletonBuilder::skeleton( save, save );
 		showImage( buff, save );
 		imwrite( buff, save );
 
