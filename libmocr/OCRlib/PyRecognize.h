@@ -20,7 +20,8 @@ const char* NativeRecognize(const char* inImagePath)
 	cv::Mat theProcessedImage = thePreProcessor.process(inImagePath);
 	theTree.build(theProcessedImage);
 	std::vector< std::string > theLeafsStrs = theRecognizer.recognizeLeafs(&theTree);
-	std::string theResult = theStructurer.structure(theProcessedImage, theTree.getLeafs(), theLeafsStrs);
+	//std::string theResult = theStructurer.structure(theProcessedImage, theTree.getLeafs(), theLeafsStrs);
 
-	return theResult.c_str();
+	//return theResult.c_str();
+	return "";
 }

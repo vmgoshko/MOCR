@@ -83,8 +83,8 @@ void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex )
 	invert( obj.object );
 	theSkeletonBuilder.thinningGuoHall(obj.object);
 	obj = bound(&obj.object, 255);
-
-	std::vector< float >* theCharacteristics = new std::vector< float >(theSkeletonBuilder.calculateCharacteristic(obj.object, 255));
+	theSkeletonBuilder.calculateCharacteristic(obj.object, 255);
+	std::vector< float >* theCharacteristics = new std::vector< float >(theSkeletonBuilder.calculateCharacteristicVectorize(obj.object, 255));
 	mObjects.push_back( theCharacteristics );
 
 	//create output
@@ -116,7 +116,7 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 	invert(obj.object);
 	theSkeletonBuilder.thinningGuoHall(obj.object);
 	obj = bound(&obj.object, 255);
-	std::vector< float > theCharacteristics = theSkeletonBuilder.calculateCharacteristic(obj.object, 255);
+	std::vector< float > theCharacteristics = theSkeletonBuilder.calculateCharacteristicVectorize(obj.object, 255);
 
 	Mat input(1, theCharacteristics.size(), CV_32F);
 	Mat predictOutput = Mat::zeros(1, mOutputStrings->size(), CV_32F);
