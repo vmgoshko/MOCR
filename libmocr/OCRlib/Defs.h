@@ -3,9 +3,15 @@
 
 #include <opencv\cv.h>
 
+#define MAX_ASSIGN(x,y) if( (x) < (y) ) x = y;
+#define MIN_ASSIGN(x,y) if( (x) > (y) ) x = y;
+
 namespace Config
 {
 	const int cNeuralNetworkImageHeight = 150;
+	const int cNeighboursDistance = 3;
+	const int cMaxDistance = 5;
+	const int cMaxLineLength = 2 * cNeuralNetworkImageHeight;
 }
 
 struct Bound 

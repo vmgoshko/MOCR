@@ -1,9 +1,10 @@
+#include <opencv2/core/core.hpp>
+#include <opencv/cv.h>
+
 #include "SkeletonBuilder.h"
+#include "Graph.h"
 
 #define min( x, y ) (x) < (y) ? (x) : (y);
-#define MAX_DISTANCE 5
-#define MAX_LINE_LENGTH 2*Config::cNeuralNetworkImageHeight
-#define NEIGHBOURS_DISTANCE 3
 
 SkeletonBuilder::~SkeletonBuilder()
 {
@@ -285,63 +286,6 @@ void SkeletonBuilder::thinningGuoHallIteration(cv::Mat& im, int iter)
 	im &= ~marker;
 }
 
-bool isNeighbours(cv::Point* f, cv::Point* s)
-{
-	return abs(f->x - s->x) <= NEIGHBOURS_DISTANCE && abs(f->y - s->y) <= NEIGHBOURS_DISTANCE && (abs(f->x - s->x) + abs(f->y - s->y) != 0);
-}
-
-void deepSearch(Node* inNode)
-{
-	inNode->looked = true;
-
-
-	for (int i = 0; i < inNode->neighbours.size(); i++)
-	{
-		Node* theNode = inNode->neighbours[i];
-		if (isNeighbours(inNode->coords, theNode->coords))
-		{
-			inNode->erase(theNode);
-			theNode->erase(inNode);
-			theNode->replaceThisByNode(theNode, inNode);
-			inNode->addNeighbours(theNode->neighbours);
-			--i;
-		}
-	}
-
-	for (int i = 0; i < inNode->neighbours.size(); i++)
-	{
-		Node* theNode = inNode->neighbours[i];
-		if (!theNode->looked)
-		{
-			deepSearch(theNode);
-		}
-	}
-
-}
-
-void deepDraw(Node* inNode, cv::Mat& outImg)
-{
-	inNode->drawed = true;
-	cv::Point start;
-	cv::Point end;
-	start.x = inNode->coords->y;
-	start.y = inNode->coords->x;
-
-	for (auto theNode : inNode->neighbours)
-	{
-		end.x = theNode->coords->y;
-		end.y = theNode->coords->x;
-
-		line(outImg, start, end, cv::Scalar(255, 0, 0), 1);
-		line(outImg, end, end, cv::Scalar(255, 255, 255), 1);
-
-		if (!theNode->drawed)
-			deepDraw(theNode, outImg);
-	}
-
-	line(outImg, start, start, cv::Scalar(255, 255, 255), 1);
-}
-
 void SkeletonBuilder::createNodesPoints(int rows, int cols)
 {
 	std::vector< Node* > theNodeRow(cols, nullptr);
@@ -424,7 +368,7 @@ void SkeletonBuilder::findStartPixel(cv::Mat& inSkeleton, float inObjectColor, i
 	}
 }
 
-std::vector< Line* > SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::Mat& outImg)
+Node* SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::Mat& outImg)
 {
 	createNodesPoints(inSkeleton.rows, inSkeleton.cols);
 	int xStart;
@@ -438,9 +382,11 @@ std::vector< Line* > SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObj
 	
 	Node* theRoot = createGraph(theLines);
 	deepSearch(theRoot);
+#ifdef _DEBUG
 	deepDraw(theRoot, outImg);
+#endif
 
-	return theLines;
+	return theRoot;
 }
 
 cv::Point* SkeletonBuilder::neighbour(cv::Mat& inSkeleton, float inObjectColor, std::vector<cv::Point*>& theLine, int inRow, int inCol)
@@ -489,7 +435,7 @@ bool SkeletonBuilder::isAllowableLine(std::vector<cv::Point*>& inLine)
 
 	float theDistance = distance(A, B, C, inLine[inLine.size() / 2]);
 
-	return theDistance < MAX_DISTANCE && inLine.size() <= MAX_LINE_LENGTH;
+	return theDistance < Config::cMaxDistance && inLine.size() <= Config::cMaxLineLength;
 }
 
 cv::Point* SkeletonBuilder::getPoint(int x, int y)
@@ -506,7 +452,7 @@ Node* SkeletonBuilder::getNode(int x, int y)
 {
 	if (mNodes[x][y] == NULL)
 	{
-		mNodes[x][y] = new Node();
+		mNodes[x][y] = new Node(mNodesCounter++);
 	}
 
 	return mNodes[x][y];
@@ -749,13 +695,18 @@ std::vector< float > SkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleto
 std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& inSkeleton, float inObjectColor)
 {
 	cv::Mat theVectorImage;
-	std::vector< Line* > theLines = vectorize(inSkeleton, inObjectColor, theVectorImage);
+	Node* theRoot = vectorize(inSkeleton, inObjectColor, theVectorImage);
 	std::vector< float > theCharacteristics(7, 0);
 	float theLength = 0;
 
+	massCenter(theRoot, theCharacteristics[0], theCharacteristics[1]);
+	theCharacteristics[0] /= mNodesCounter;
+	theCharacteristics[1] /= mNodesCounter;
+	theCharacteristics[2] = cyclesCount(theRoot, mNodesCounter);
+
 	float theWidth = inSkeleton.cols;
 	float theHeight = inSkeleton.rows;
-
+	/*
 	for (Line* theLine : theLines)
 	{
 		theLength += theLine->length();
@@ -783,6 +734,6 @@ std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& 
 
 	theCharacteristics[0] /= theHeight;
 	theCharacteristics[1] /= theWidth;
-	theCharacteristics[2] /= theWidth * theHeight;
+	theCharacteristics[2] /= theWidth * theHeight;*/
 	return theCharacteristics;
 }
