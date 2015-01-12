@@ -6,7 +6,7 @@
 #include "PyRecognize.h"
 
 namespace {
-	const char* imagePath = "img/iwona_traindata_fixed.png";
+	const char* imagePath = "img/numbers.png";
 };
 
 void main()

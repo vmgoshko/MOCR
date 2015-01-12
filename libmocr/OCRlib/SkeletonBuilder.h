@@ -94,7 +94,7 @@ private:
 	std::vector<std::vector<Node*>> mNodes;
 	std::vector<std::vector<cv::Point*>> mPoints;
 	std::queue< cv::Point* > mCrossPoints;
-	int mNodesCounter = 0;
+	int mNodesCount = 0;
 };
 
 #endif //SKELETON_BUILDER_H

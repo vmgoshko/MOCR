@@ -116,7 +116,7 @@ void deepSearch(Node* inNode)
 	}
 }
 
-static void cyclesCountRecursive(Node* inNode, int& outCyclesCount, bool** inMarks)
+static void cyclesCountRecursive(Node* inNode, float& outCyclesCount, bool** inMarks)
 {
 	if (inNode->visitedCycle)
 	{
@@ -137,7 +137,7 @@ static void cyclesCountRecursive(Node* inNode, int& outCyclesCount, bool** inMar
 	}
 }
 
-int cyclesCount(Node* inNode, int inNodesCount)
+void cyclesCount(Node* inNode, int inNodesCount, float& outCyclesCount)
 {
 	bool** theMarks = new bool*[inNodesCount];
 
@@ -147,9 +147,7 @@ int cyclesCount(Node* inNode, int inNodesCount)
 		memset(theMarks[i], 0, sizeof(bool) * inNodesCount);
 	}
 
-	int theCyclesCount = 0;
-	
-	cyclesCountRecursive(inNode, theCyclesCount, theMarks);
+	cyclesCountRecursive(inNode, outCyclesCount, theMarks);
 
 	for (int i = 0; i < inNodesCount; i++)
 	{
@@ -157,20 +155,84 @@ int cyclesCount(Node* inNode, int inNodesCount)
 	}
 
 	delete[] theMarks;
-
-	return theCyclesCount;
 }
 
-void massCenter(Node* inNode, float& outX, float& outY)
+static float distance(cv::Point* a, cv::Point* b)
 {
-	if (inNode->visitedMassCenter)
-		return;
-
-	outX += inNode->coords->x;
-	outY += inNode->coords->y;
-	inNode->visitedMassCenter = true;
-
-	for (auto theNode : inNode->neighbours)
-		massCenter(theNode, outX, outY);
+	return cv::norm(*a-*b);
 }
+
+static void fullLengthRecursive(Node* inNode, float& outLength, bool** inEdges)
+{
+	for (auto theNode : inNode->neighbours)
+	{
+		if (!inEdges[inNode->id][theNode->id] && !inEdges[theNode->id][inNode->id])
+		{
+			inEdges[inNode->id][theNode->id] = true;
+			inEdges[theNode->id][inNode->id] = true;
+			outLength += distance(inNode->coords, theNode->coords);
+			fullLengthRecursive(theNode, outLength, inEdges);
+		}
+	}
+}
+
+void fullLength(Node* inNode, int inNodesCount, float& outFullLength)
+{
+	bool** theMarks = new bool*[inNodesCount];
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		theMarks[i] = new bool[inNodesCount];
+		memset(theMarks[i], 0, sizeof(bool)* inNodesCount);
+	}
+
+	fullLengthRecursive(inNode, outFullLength, theMarks);
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		delete[] theMarks[i];
+	}
+
+	delete[] theMarks;
+}
+
+void massCenterRecursive(Node* inNode, float& outX, float& outY, bool** inEdges)
+{
+	for (auto theNode : inNode->neighbours)
+	{
+		if (!inEdges[inNode->id][theNode->id] && !inEdges[theNode->id][inNode->id])
+		{
+			inEdges[inNode->id][theNode->id] = true;
+			inEdges[theNode->id][inNode->id] = true;
+			float theLength = distance(inNode->coords, theNode->coords);
+
+			outX += theLength * (inNode->coords->x + theNode->coords->x) / 2;
+			outY += theLength * (inNode->coords->y + theNode->coords->y) / 2;
+
+			massCenterRecursive(theNode, outX, outY, inEdges);
+		}
+	}
+}
+
+void massCenter(Node* inNode, int inNodesCount, float& outX, float& outY)
+{
+	bool** theEdges = new bool*[inNodesCount];
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		theEdges[i] = new bool[inNodesCount];
+		memset(theEdges[i], 0, sizeof(bool)* inNodesCount);
+	}
+
+	massCenterRecursive(inNode, outX, outY, theEdges);
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		delete[] theEdges[i];
+	}
+
+	delete[] theEdges;
+}
+
+void neighbours()
 #endif

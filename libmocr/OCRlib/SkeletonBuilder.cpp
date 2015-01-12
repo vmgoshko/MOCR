@@ -452,7 +452,7 @@ Node* SkeletonBuilder::getNode(int x, int y)
 {
 	if (mNodes[x][y] == NULL)
 	{
-		mNodes[x][y] = new Node(mNodesCounter++);
+		mNodes[x][y] = new Node(mNodesCount++);
 	}
 
 	return mNodes[x][y];
@@ -697,32 +697,19 @@ std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& 
 	cv::Mat theVectorImage;
 	Node* theRoot = vectorize(inSkeleton, inObjectColor, theVectorImage);
 	std::vector< float > theCharacteristics(7, 0);
+	
 	float theLength = 0;
-
-	massCenter(theRoot, theCharacteristics[0], theCharacteristics[1]);
-	theCharacteristics[0] /= mNodesCounter;
-	theCharacteristics[1] /= mNodesCounter;
-	theCharacteristics[2] = cyclesCount(theRoot, mNodesCounter);
-
-	float theWidth = inSkeleton.cols;
-	float theHeight = inSkeleton.rows;
-	/*
-	for (Line* theLine : theLines)
-	{
-		theLength += theLine->length();
-	}
-
-	for (Line* theLine : theLines)
-	{
-		theCharacteristics[0] += theLine->length() * theLine->center().x;
-		theCharacteristics[1] += theLine->length() * theLine->center().y;
-	}
-
+	fullLength(theRoot, mNodesCount, theLength);
+	massCenter(theRoot, mNodesCount, theCharacteristics[0], theCharacteristics[1]);
+	cyclesCount(theRoot, mNodesCount, theCharacteristics[2]);
+	
 	theCharacteristics[0] /= theLength;
 	theCharacteristics[1] /= theLength;
 
-	cv::Point theMassCenter(theCharacteristics[0], theCharacteristics[1]);
+	float theWidth = inSkeleton.cols;
+	float theHeight = inSkeleton.rows;
 
+	/*
 	for (Line* theLine : theLines)
 	{
 		cv::Point* theStart = theLine->start;
