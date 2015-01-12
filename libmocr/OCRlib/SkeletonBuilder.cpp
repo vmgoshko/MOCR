@@ -706,6 +706,8 @@ std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& 
 	theCharacteristics[0] /= theLength;
 	theCharacteristics[1] /= theLength;
 
+
+	neighbours(theRoot, mNodesCount, theCharacteristics[3], theCharacteristics[4], theCharacteristics[5], theCharacteristics[6]);
 	float theWidth = inSkeleton.cols;
 	float theHeight = inSkeleton.rows;
 

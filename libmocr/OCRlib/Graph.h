@@ -4,6 +4,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv/cv.h>
 
+#include <vector>
 struct Node
 {
 	cv::Point* coords;
@@ -234,5 +235,44 @@ void massCenter(Node* inNode, int inNodesCount, float& outX, float& outY)
 	delete[] theEdges;
 }
 
-void neighbours()
+void neighboursRecursive(Node* inNode, bool** inEdges, float& outOne, float& outTwo, float& outThree, float& outFour)
+{
+	switch (inNode->neighbours.size())
+	{
+		case 1: outOne++; break;
+		case 2: outTwo++; break;
+		case 3: outThree++; break;
+		case 4: outFour++; break;
+	}
+
+	for (auto theNode : inNode->neighbours)
+	{
+		if (!inEdges[inNode->id][theNode->id] && !inEdges[theNode->id][inNode->id])
+		{
+			inEdges[inNode->id][theNode->id] = true;
+			inEdges[theNode->id][inNode->id] = true;
+			neighboursRecursive(theNode, inEdges, outOne, outTwo, outThree, outFour);
+		}
+	}
+}
+
+void neighbours(Node* inNode, int inNodesCount, float& outOne, float& outTwo, float& outThree, float& outFour)
+{
+	bool** theEdges = new bool*[inNodesCount];
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		theEdges[i] = new bool[inNodesCount];
+		memset(theEdges[i], 0, sizeof(bool)* inNodesCount);
+	}
+
+	neighboursRecursive(inNode, theEdges, outOne, outTwo, outThree, outFour);
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		delete[] theEdges[i];
+	}
+
+	delete[] theEdges;
+}
 #endif
