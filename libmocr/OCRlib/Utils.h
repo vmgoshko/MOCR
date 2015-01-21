@@ -10,7 +10,7 @@
 #include "Defs.h"
 
 // Should be optimized somehow
-cv::Mat submat( cv::Mat m, Bound b );
+cv::Mat submat( cv::Mat& m, Bound b );
 
 std::string saveTempFile( cv::Mat* image );
 

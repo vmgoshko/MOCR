@@ -9,7 +9,7 @@
 namespace Config
 {
 	const int cNeuralNetworkImageHeight = 150;
-	const int cNeighboursDistance = 3;
+	const int cNeighboursDistance = 20;
 	const int cMaxDistance = 5;
 	const int cMaxLineLength = 2 * cNeuralNetworkImageHeight;
 }

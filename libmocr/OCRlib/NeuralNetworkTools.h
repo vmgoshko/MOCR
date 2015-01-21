@@ -11,9 +11,9 @@ public:
 	NeuralNetworkTools();
 	~NeuralNetworkTools();
 
-	void performeTraining();
+	void performTraining();
 	void setOutput( std::vector<char*>* outs );
-	void addObject(BlackObject& obj, int outIndex);
+	void addObject(BlackObject& obj, int inIndex);
 	bool load();
 	bool save(const char* name);
 	const char* predict(BlackObject& object);

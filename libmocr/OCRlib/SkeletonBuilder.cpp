@@ -291,7 +291,7 @@ void SkeletonBuilder::createNodesPoints(int rows, int cols)
 	std::vector< Node* > theNodeRow(cols, nullptr);
 	mNodes.assign(rows, theNodeRow);
 
-	std::vector< cv::Point* > thePointRow(cols, nullptr);
+	std::vector< cv::Point2f* > thePointRow(cols, nullptr);
 	mPoints.assign(rows, thePointRow);
 }
 
@@ -310,6 +310,13 @@ void SkeletonBuilder::deleteNodesPoints()
 
 Node* SkeletonBuilder::createGraph(std::vector< Line*> inLines)
 {
+	if (inLines.size() == 0)
+	{
+		Node* theNode = getNode(0, 0);
+		theNode->coords = new cv::Point2f(0, 0);
+		return theNode;
+	}
+
 	for (auto theLine : inLines)
 	{
 		Node* theNode = getNode(theLine->start->x, theLine->start->y);
@@ -368,7 +375,7 @@ void SkeletonBuilder::findStartPixel(cv::Mat& inSkeleton, float inObjectColor, i
 	}
 }
 
-Node* SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::Mat& outImg)
+Node* SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, int& outSectionsCount, cv::Mat& outImg)
 {
 	createNodesPoints(inSkeleton.rows, inSkeleton.cols);
 	int xStart;
@@ -379,7 +386,9 @@ Node* SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::M
 	outImg.setTo(0);
 	
 	std::vector< Line* > theLines = findLines(inSkeleton, inObjectColor, xStart, yStart);
-	
+
+	outSectionsCount = theLines.size();
+
 	Node* theRoot = createGraph(theLines);
 	deepSearch(theRoot);
 #ifdef _DEBUG
@@ -389,9 +398,9 @@ Node* SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, cv::M
 	return theRoot;
 }
 
-cv::Point* SkeletonBuilder::neighbour(cv::Mat& inSkeleton, float inObjectColor, std::vector<cv::Point*>& theLine, int inRow, int inCol)
+cv::Point2f* SkeletonBuilder::neighbour(cv::Mat& inSkeleton, float inObjectColor, std::vector<cv::Point2f*>& theLine, int inRow, int inCol)
 {
-	cv::Point* theResult;
+	cv::Point2f* theResult;
 
 	for (int i = inRow - 1; i <= inRow + 1; i++)
 		for (int j = inCol - 1; j <= inCol + 1; j++)
@@ -404,7 +413,7 @@ cv::Point* SkeletonBuilder::neighbour(cv::Mat& inSkeleton, float inObjectColor, 
 			
 			if (inSkeleton.at<uchar>(i, j) == inObjectColor )
 			{
-				cv::Point* thePoint = getPoint(i, j);
+				cv::Point2f* thePoint = getPoint(i, j);
 				return thePoint;
 			}
 		}
@@ -412,7 +421,7 @@ cv::Point* SkeletonBuilder::neighbour(cv::Mat& inSkeleton, float inObjectColor, 
 	return NULL;
 }
 
-float SkeletonBuilder::distance(float A, float B, float C, cv::Point* pt)
+float SkeletonBuilder::distance(float A, float B, float C, cv::Point2f* pt)
 {
 	float theDistance = abs(A * pt->x + B * pt->y + C);
 	theDistance /= sqrt(A*A + B*B);
@@ -420,7 +429,7 @@ float SkeletonBuilder::distance(float A, float B, float C, cv::Point* pt)
 	return theDistance;
 }
 
-bool SkeletonBuilder::isAllowableLine(std::vector<cv::Point*>& inLine)
+bool SkeletonBuilder::isAllowableLine(std::vector<cv::Point2f*>& inLine)
 {
 	if (inLine.size() < 3)
 		return true;
@@ -438,11 +447,11 @@ bool SkeletonBuilder::isAllowableLine(std::vector<cv::Point*>& inLine)
 	return theDistance < Config::cMaxDistance && inLine.size() <= Config::cMaxLineLength;
 }
 
-cv::Point* SkeletonBuilder::getPoint(int x, int y)
+cv::Point2f* SkeletonBuilder::getPoint(int x, int y)
 {
 	if (mPoints[x][y] == NULL)
 	{
-		mPoints[x][y] = new cv::Point(x, y);
+		mPoints[x][y] = new cv::Point2f(x, y);
 	}
 
 	return mPoints[x][y];
@@ -459,7 +468,7 @@ Node* SkeletonBuilder::getNode(int x, int y)
 }
 
 
-Line* SkeletonBuilder::newLine(std::vector< cv::Point* >& inLine, int& outNewX, int& outNewY)
+Line* SkeletonBuilder::newLine(std::vector< cv::Point2f* >& inLine, int& outNewX, int& outNewY)
 {
 	Line* theNewLine = new Line();
 	theNewLine->start = *inLine.begin();
@@ -476,9 +485,9 @@ Line* SkeletonBuilder::newLine(std::vector< cv::Point* >& inLine, int& outNewX, 
 
 std::vector< Line* > SkeletonBuilder::findLines(cv::Mat& inSkeleton, float inObjectColor, int xStart, int yStart)
 {
-	std::vector<cv::Point*> theLine;
+	std::vector<cv::Point2f*> theLine;
 	std::vector< Line* > theResult;
-	std::queue< cv::Point*> mCrossPoints;
+	std::queue< cv::Point2f*> mCrossPoints;
 
 	theLine.push_back(getPoint(xStart, yStart));
 
@@ -486,14 +495,14 @@ std::vector< Line* > SkeletonBuilder::findLines(cv::Mat& inSkeleton, float inObj
 	int y = yStart;
 	while (true)
 	{
-		cv::Point* theNeighbour = neighbour(inSkeleton, inObjectColor, theLine, x, y);
+		cv::Point2f* theNeighbour = neighbour(inSkeleton, inObjectColor, theLine, x, y);
 		
 		if (!theNeighbour && mCrossPoints.empty())
 			break;
 
 		if (!theNeighbour)
 		{
-			cv::Point thePoint = *mCrossPoints.front();
+			cv::Point2f thePoint = *mCrossPoints.front();
 			std::vector< Line* > theCrossPtLines = findLines(inSkeleton, inObjectColor, thePoint.x, thePoint.y);
 			theResult.insert(theResult.end(), theCrossPtLines.begin(), theCrossPtLines.end());
 
@@ -695,8 +704,9 @@ std::vector< float > SkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleto
 std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& inSkeleton, float inObjectColor)
 {
 	cv::Mat theVectorImage;
-	Node* theRoot = vectorize(inSkeleton, inObjectColor, theVectorImage);
-	std::vector< float > theCharacteristics(7, 0);
+	int theSectionsCount = 0;
+	Node* theRoot = vectorize(inSkeleton, inObjectColor, theSectionsCount, theVectorImage);
+	std::vector< float > theCharacteristics(8, 0);
 	
 	float theLength = 0;
 	fullLength(theRoot, mNodesCount, theLength);
@@ -706,23 +716,24 @@ std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& 
 	theCharacteristics[0] /= theLength;
 	theCharacteristics[1] /= theLength;
 
+	float f = 0;
+	neighbours(theRoot, mNodesCount, theCharacteristics[3], f, theCharacteristics[4], theCharacteristics[5]);
+	float theWidth;
+	float theHeight;
 
-	neighbours(theRoot, mNodesCount, theCharacteristics[3], theCharacteristics[4], theCharacteristics[5], theCharacteristics[6]);
-	float theWidth = inSkeleton.cols;
-	float theHeight = inSkeleton.rows;
-
-	/*
-	for (Line* theLine : theLines)
-	{
-		cv::Point* theStart = theLine->start;
-		cv::Point* theEnd = theLine->end;
-
-		float theSquare = 0.5f * ((theStart->x - theEnd->x)*(theMassCenter.y - theEnd->y) - (theMassCenter.x - theEnd->x)*(theStart->y - theEnd->y));
-		theCharacteristics[2] += abs(theSquare);
-	}
+	findWidthHeigth(theRoot, mNodesCount, theWidth, theHeight);
 
 	theCharacteristics[0] /= theHeight;
 	theCharacteristics[1] /= theWidth;
-	theCharacteristics[2] /= theWidth * theHeight;*/
+	
+	/*// —редн€€ длина отрезка
+	theCharacteristics[6] = theLength / theSectionsCount;
+	theCharacteristics[6] /= theHeight * theWidth;
+	*/
+	int theLeftTurns = 0;
+	int theRightTurns = 0;
+	turns(theRoot, mNodesCount, theLeftTurns, theRightTurns);
+	theCharacteristics[6] = theLeftTurns;
+	theCharacteristics[7] = theRightTurns;
 	return theCharacteristics;
 }

@@ -35,7 +35,7 @@ public:
 		if ( max != 0 )
 			transform(inPossibleStrings.begin(), inPossibleStrings.end(), inPossibleStrings.begin(), std::bind2nd(std::divides<float>(), max));
 		
-		for (int i = 0; i < inPossibleStrings.size(); i++)
+		for (size_t i = 0; i < inPossibleStrings.size(); i++)
 		{
 			if (inPossibleStrings[i] != 0)
 			{
@@ -90,18 +90,15 @@ public:
 			}
 
 		for (int i = 0; i < theWidth && i < resizedImage.cols; i++)
-		for (int j = 0; j < theHeight && i < resizedImage.rows; j++)
-			{
-				if (resizedImage.at<uchar>(j, i) == 0)
-					theMatch += theWeights[i][j];
-			}
+			for (int j = 0; j < theHeight && i < resizedImage.rows; j++)
+					if (resizedImage.at<uchar>(j, i) == 0)
+						theMatch += theWeights[i][j];
 
 		cv::Mat img(theWeights[0].size(), theWeights.size(), CV_32FC1);
 		for (int i = 0; i < theWidth; i++)
 			for (int j = 0; j < theHeight && i < resizedImage.rows; j++)
-			{
-				img.at<float>(j, i) = theWeights[i][j];
-			}
+				img.at<float>(j, i) = (float)theWeights[i][j];
+
 		return theMatch;
 	}
 	

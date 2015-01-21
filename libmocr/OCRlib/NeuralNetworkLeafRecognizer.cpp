@@ -14,15 +14,8 @@
 NeuralNetworkLeafRecognizer::NeuralNetworkLeafRecognizer()
 {
 	// Custom neural network prediction
-	tools = new NeuralNetworkTools();
-	tools->setOutput( getOutsVector() );
-	tools->load();
-}
-
-NeuralNetworkLeafRecognizer::~NeuralNetworkLeafRecognizer()
-{
-	// Custom neural network prediction
-	delete tools;
+	tools.setOutput( getOutsVector() );
+	tools.load();
 }
 
 std::vector<std::string> NeuralNetworkLeafRecognizer::recognizeLeafs(ComponentsTree* tree, std::vector< std::vector< float > >* inPosibilities)
@@ -46,7 +39,6 @@ std::string NeuralNetworkLeafRecognizer::recognizeLeaf( cv::Mat* leaf )
 	BlackObject theObject;
 	theObject.object = *leaf;
 
-	// Custom neural network prediction
-	const char* pr = tools->predict(theObject);
-	return std::string( pr );
+	const char* theCharacter = tools.predict(theObject);
+	return std::string(theCharacter);
 }

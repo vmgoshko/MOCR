@@ -37,15 +37,16 @@ void NeuralNetworkTools::fillCriteriaAndParamsEps(CvTermCriteria& outCriteria, C
 
 void NeuralNetworkTools::fillCriteriaAndParamsIter(CvTermCriteria& outCriteria, CvANN_MLP_TrainParams& outTrainParams)
 {
-	outCriteria.max_iter = 1;
-	outCriteria.type = CV_TERMCRIT_ITER /*| CV_TERMCRIT_EPS*/;
+	outCriteria.max_iter = 1000;
+	outCriteria.type = CV_TERMCRIT_ITER;
 
 	outTrainParams.train_method = CvANN_MLP_TrainParams::BACKPROP;
 	outTrainParams.bp_dw_scale = 0.1f;
 	outTrainParams.bp_moment_scale = 0.1f;
 	outTrainParams.term_crit = outCriteria;
 }
-void NeuralNetworkTools::performeTraining()
+
+void NeuralNetworkTools::performTraining()
 {
 	Mat inputs(mObjects.size(), mObjects[0]->size(), CV_32F);
 	Mat outputs( mObjectOutputs.size(), mOutputStrings->size(), CV_32F );
@@ -72,7 +73,36 @@ void showImage( const char* name, cv::Mat& img )
 	cv::imshow( name, img );
 }
 
-void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex )
+int count(cv::Mat& mat, int i)
+{
+	int res = 0;
+
+	for (int j = 0; j < mat.rows; j++)
+	{
+		if (mat.at<uchar>(j, i) > 0)
+			res++;
+	}
+
+	return res;
+}
+
+cv::Mat* drawH(cv::Mat& obj)
+{
+	cv::Mat* res = new cv::Mat(obj.rows, obj.cols, CV_8UC1, 255);
+
+	for (int i = 0; i < obj.cols; i++)
+	{
+		int countB = count(obj, i);
+
+		for (int j = res->rows; j >= res->rows - countB; j--)
+		{
+			res->at<uchar>(j, i) = 0;
+		}
+	}
+	return res;
+}
+
+void NeuralNetworkTools::addObject( BlackObject& obj, int inIndex )
 {
 	SkeletonBuilder theSkeletonBuilder;
 	obj = bound(&obj.object, 0);
@@ -83,13 +113,13 @@ void NeuralNetworkTools::addObject( BlackObject& obj, int outIndex )
 	invert( obj.object );
 	theSkeletonBuilder.thinningGuoHall(obj.object);
 	obj = bound(&obj.object, 255);
-	theSkeletonBuilder.calculateCharacteristic(obj.object, 255);
+	//theSkeletonBuilder.calculateCharacteristic(obj.object, 255);
 	std::vector< float >* theCharacteristics = new std::vector< float >(theSkeletonBuilder.calculateCharacteristicVectorize(obj.object, 255));
 	mObjects.push_back( theCharacteristics );
 
 	//create output
 	vector<float>* out = new vector<float>( mOutputStrings->size( ), -1 );
-	out->at(outIndex) = 1;
+	out->at(inIndex) = 1;
 	mObjectOutputs.push_back(out);
 }
 
@@ -131,8 +161,8 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 
 	std::vector< float > theResult(thePredictOutPtr, thePredictOutPtr + thePredictOutSize);
 	transform(theResult.begin(), theResult.end(), theResult.begin(), std::bind2nd(std::plus<float>(), theOffset));
-	float average = std::accumulate(theResult.begin(), theResult.end(), 0.f) / theResult.size();
-	for_each(theResult.begin(), theResult.end(), LessAverageToNullFunctor(average));
+	float theAverage = std::accumulate(theResult.begin(), theResult.end(), 0.f) / theResult.size();
+	for_each(theResult.begin(), theResult.end(), LessAverageToNullFunctor(theAverage));
 
 	float theMaxValue = *max_element(theResult.begin(), theResult.end());
 	transform(theResult.begin(), theResult.end(), theResult.begin(), std::bind2nd(std::divides<float>(), theMaxValue));

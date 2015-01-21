@@ -9,7 +9,7 @@
 #include <opencv/cv.h>
 
 // Should be optimized somehow
-cv::Mat submat( cv::Mat m, Bound b )
+cv::Mat submat( cv::Mat& m, Bound b )
 {
 	int w = b.r-b.l;
 	int h = b.b-b.t;
@@ -189,10 +189,11 @@ std::vector<char*>* getOutsVector()
 	chars->push_back( "0" );
 	chars->push_back( "(" );
 	chars->push_back( ")" );
+	//chars->push_back( "." );
 
 	chars->push_back( "+" );
-	chars->push_back( "-" );
-	//chars->push_back( "*" );
+	//chars->push_back( "-" );
+	chars->push_back( "*" );
 	chars->push_back( "/" );
 	
 	chars->push_back( "a" );

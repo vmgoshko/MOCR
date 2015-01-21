@@ -13,22 +13,26 @@
 using namespace cv;
 using namespace std;
 
+namespace {
+	const char* cTrainDataFilePath = "img/iwona_traindata_fixed.png";
+	const char* cNeuralNetworkSavePath = "../cvtest/nn";
+}
+
 void main()
 {
 	NeuralNetworkTools neuralNetTools;
 	ImagePreProccessor preProcessor;
 
-	cv::Mat image = preProcessor.process("img/iwona_traindata.png");
+	cv::Mat image = preProcessor.process(cTrainDataFilePath);
 	
-	vector< BlackObject > mObjects = preProcessor.getBlackObjects();
+	vector< BlackObject > theBlackObjects = preProcessor.getBlackObjects();
 	neuralNetTools.setOutput(getOutsVector());
-	for (size_t i = 0; i < mObjects.size(); i++)
-	{
-		neuralNetTools.addObject(mObjects[i], i);
-	}
+	
+	int theIndex = 0;
+	for (auto theObject : theBlackObjects)
+		neuralNetTools.addObject(theObject, theIndex++);
 
-	neuralNetTools.performeTraining();
-	neuralNetTools.save("../cvtest/nn");
-	cvWaitKey();
+	neuralNetTools.performTraining();
+	neuralNetTools.save(cNeuralNetworkSavePath);
 	system( "pause" );
 }

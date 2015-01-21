@@ -7,7 +7,7 @@
 #include <vector>
 struct Node
 {
-	cv::Point* coords;
+	cv::Point2f* coords;
 	std::vector< Node* > neighbours;
 	int id;
 
@@ -63,8 +63,8 @@ struct Node
 void deepDraw(Node* inNode, cv::Mat& outImg)
 {
 	inNode->drawed = true;
-	cv::Point start;
-	cv::Point end;
+	cv::Point2f start;
+	cv::Point2f end;
 	start.x = inNode->coords->y;
 	start.y = inNode->coords->x;
 
@@ -83,7 +83,7 @@ void deepDraw(Node* inNode, cv::Mat& outImg)
 	line(outImg, start, start, cv::Scalar(255, 255, 255), 1);
 }
 
-bool isNeighbours(cv::Point* f, cv::Point* s)
+bool isNeighbours(cv::Point2f* f, cv::Point2f* s)
 {
 	return abs(f->x - s->x) <= Config::cNeighboursDistance &&
 			abs(f->y - s->y) <= Config::cNeighboursDistance &&
@@ -158,7 +158,79 @@ void cyclesCount(Node* inNode, int inNodesCount, float& outCyclesCount)
 	delete[] theMarks;
 }
 
-static float distance(cv::Point* a, cv::Point* b)
+void turnsRecursive(Node* inNode, int& outLeftTurns, int& outRightTurns, bool** theEdges)
+{
+	std::vector< Node* >& theInNodeNeighbours = inNode->neighbours;
+
+	Node* theTurnBegin = inNode;
+	for (auto theTurnCenter : theInNodeNeighbours)
+	{
+		if (!theEdges[theTurnBegin->id][theTurnCenter->id] && !theEdges[theTurnCenter->id][theTurnBegin->id])
+		{
+			theEdges[theTurnBegin->id][theTurnCenter->id] = true;
+			theEdges[theTurnCenter->id][theTurnBegin->id] = true;
+		}
+		else
+			continue;
+
+		std::vector< Node* > theTurnCenterNeighbours = theTurnCenter->neighbours;
+
+		for (auto theTurnEnd : theTurnCenterNeighbours)
+		{
+			if (theTurnEnd == theTurnCenter)
+				continue;
+
+
+			/*if (!theEdges[theTurnEnd->id][theTurnCenter->id] && !theEdges[theTurnCenter->id][theTurnEnd->id])
+			{
+				theEdges[theTurnEnd->id][theTurnCenter->id] = true;
+				theEdges[theTurnCenter->id][theTurnEnd->id] = true;
+			}
+			else
+				continue;
+				*/
+			float x1 = theTurnBegin->coords->x;
+			float x2 = theTurnCenter->coords->x;
+			float x3 = theTurnEnd->coords->x;
+
+			float y1 = theTurnBegin->coords->y;
+			float y2 = theTurnCenter->coords->y;
+			float y3 = theTurnEnd->coords->y;
+
+			float D = (x3 - x1) * (y2 - y1) - (y3 - y1) * (x2 - x1);
+
+			if (D < 0)
+				++outLeftTurns;
+			else
+				++outRightTurns;
+
+			turnsRecursive(theTurnCenter, outLeftTurns, outRightTurns, theEdges);
+		}
+	}
+
+}
+
+void turns(Node* inNode, int inNodesCount, int& outLeftTurns, int& outRightTurns)
+{
+	bool** theEdges = new bool*[inNodesCount];
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		theEdges[i] = new bool[inNodesCount];
+		memset(theEdges[i], 0, sizeof(bool)* inNodesCount);
+	}
+
+	turnsRecursive(inNode, outRightTurns, outLeftTurns, theEdges);
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		delete[] theEdges[i];
+	}
+
+	delete[] theEdges;
+}
+
+static float distance(cv::Point2f* a, cv::Point2f* b)
 {
 	return cv::norm(*a-*b);
 }
@@ -226,6 +298,54 @@ void massCenter(Node* inNode, int inNodesCount, float& outX, float& outY)
 	}
 
 	massCenterRecursive(inNode, outX, outY, theEdges);
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		delete[] theEdges[i];
+	}
+
+	delete[] theEdges;
+}
+
+
+void findWidthHeigthRecursive(Node* inNode, float& inOutMinX, float& inOutMaxX, float& inOutMinY, float& inOutMaxY, bool** inEdges)
+{
+	MIN_ASSIGN(inOutMinX, inNode->coords->x)
+	MAX_ASSIGN(inOutMaxX, inNode->coords->x)
+	MIN_ASSIGN(inOutMinY, inNode->coords->y)
+	MAX_ASSIGN(inOutMaxY, inNode->coords->y)
+
+	for (auto theNode : inNode->neighbours)
+	{
+		if (!inEdges[inNode->id][theNode->id] && !inEdges[theNode->id][inNode->id])
+		{
+			inEdges[inNode->id][theNode->id] = true;
+			inEdges[theNode->id][inNode->id] = true;
+
+			findWidthHeigthRecursive(theNode, inOutMinX, inOutMaxX, inOutMinY, inOutMaxY, inEdges);
+		}
+	}
+}
+
+void findWidthHeigth(Node* inNode, int inNodesCount, float& outWidth, float& outHeight)
+{
+	bool** theEdges = new bool*[inNodesCount];
+
+	for (int i = 0; i < inNodesCount; i++)
+	{
+		theEdges[i] = new bool[inNodesCount];
+		memset(theEdges[i], 0, sizeof(bool)* inNodesCount);
+	}
+
+	float theMinX = 300;
+	float theMaxX = 0;
+	float theMinY = 300;
+	float theMaxY = 0;
+
+	findWidthHeigthRecursive(inNode, theMinX, theMaxX, theMinY, theMaxY, theEdges);
+
+	outWidth = theMaxY - theMinY;
+	outHeight = theMaxX - theMinX;
 
 	for (int i = 0; i < inNodesCount; i++)
 	{
