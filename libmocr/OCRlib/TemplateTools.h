@@ -55,7 +55,7 @@ public:
 	{
 		int theMatch = 0;
 		std::string theFileName = "templates/";
-		if (inName != "/")
+		if ( strcmp( inName, "/" ) != 0)
 			theFileName += inName;
 		else
 			theFileName += "\\";

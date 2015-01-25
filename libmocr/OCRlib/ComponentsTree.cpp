@@ -18,9 +18,9 @@ namespace {
 };
 
 Component::Component( const Component* parent, Bound bound ): 
-			parent( parent ),
-			bound( bound ),
-			children( NULL )
+				parent( parent ),
+				bound( bound ),
+				children( NULL )
 {
 }
 	
@@ -28,6 +28,7 @@ Component::Component( const Component& component )
 {
 	this->parent = component.parent;
 	this->bound = component.bound;
+	
 	if( component.children )
 		this->children = new vector< Component>( *component.children );
 	else
@@ -61,7 +62,7 @@ void Component::setChildren( std::vector< Component >* children )
 	this->children = children;
 }
 
-//Is vertical black line
+//Is vertical white line
 bool isVWL( Mat& m, int x, const Bound& bound )
 {
 	for( int i = bound.t; i < bound.b; i++ )
@@ -80,7 +81,7 @@ bool isVWL( Mat& m, int x, const Bound& bound )
 	return true;
 }
 
-//Is horizontal black line
+//Is horizontal white line
 bool isHWL( Mat& m, int y, const Bound& bound )
 {
 	for( int i = bound.l; i < bound.r; i++ )
@@ -100,11 +101,12 @@ bool isHWL( Mat& m, int y, const Bound& bound )
 
 vector<Bound>* ICE( Mat m, const Bound& bound )
 {
-	vector< Bound > res;
+	//vector< Bound > res;
 	//TODO: Implement
 	return NULL;
 }
 
+//Vertical component extraction
 vector<Component>* VCE( Mat& m, const Bound& bound, Component* parent )
 {
 	vector< Component >* res = new vector< Component >();
@@ -153,6 +155,7 @@ vector<Component>* VCE( Mat& m, const Bound& bound, Component* parent )
 	}
 }
 
+//Horizontal component extraction
 vector<Component>* HCE( Mat& m, const Bound& bound, Component* parent  )
 {
 	vector< Component >* res = new vector< Component >();

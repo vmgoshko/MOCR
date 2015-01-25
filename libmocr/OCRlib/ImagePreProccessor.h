@@ -8,7 +8,6 @@
 #include <vector>
 #include "Defs.h"
 
-
 class ImagePreProccessor {
 	private:
 		BlackObject extractObject( int i, int j );

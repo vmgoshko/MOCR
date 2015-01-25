@@ -38,9 +38,11 @@ private:
 	cv::Mat m;
 	cv::Mat srcImg;
 
-	void findLeaf( std::vector< Component >* resultVector, Component* component );
+private:
+	void findLeaf(std::vector< Component >* resultVector, Component* component);
+	std::vector< Component >* parse(int level, const Bound& bound, cv::Mat& m, Component* parent);
+
 public:
-	std::vector< Component >* parse( int level, const Bound& bound, cv::Mat& m, Component* parent );
 	void build( cv::Mat& image );
 	void show( Component* component );
 

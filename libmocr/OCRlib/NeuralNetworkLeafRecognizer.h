@@ -24,5 +24,4 @@ private:
 	NeuralNetworkTools tools;
 };
 
-
 #endif //LEAFRECOGNIZER_H

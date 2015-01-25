@@ -390,6 +390,7 @@ Node* SkeletonBuilder::vectorize(cv::Mat& inSkeleton, float inObjectColor, int& 
 	outSectionsCount = theLines.size();
 
 	Node* theRoot = createGraph(theLines);
+	theRoot->root = true;
 	deepSearch(theRoot);
 #ifdef _DEBUG
 	deepDraw(theRoot, outImg);

@@ -12,6 +12,10 @@
 using namespace std;
 using namespace cv;
 
+namespace {
+	const string cBaseSavePath = "../cvtest/templates";
+};
+
 Mat vectorToMat(vector< vector< int > >& v)
 {
 	Mat theResult(v[0].size(), v.size(), CV_8UC1);
@@ -51,8 +55,8 @@ public:
 			for (int j = 0; j < theTemplate.height; j++)
 				theWeights[i][j] = weight(theObj.object, j, i);
 			
-		string theFileName = "templates/";
-		if (name != "/")
+		string theFileName = cBaseSavePath;
+		if ( strcmp( name , "/" ) != 0 )
 			theFileName += name;
 		else
 			theFileName += "\\";

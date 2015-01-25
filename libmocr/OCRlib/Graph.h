@@ -15,6 +15,7 @@ struct Node
 	bool looked = false;
 	bool visitedCycle = false;
 	bool visitedMassCenter = false;
+	bool root = false;
 
 	Node(int inID) : id(inID) {}
 
@@ -99,10 +100,21 @@ void deepSearch(Node* inNode)
 		Node* theNode = inNode->neighbours[i];
 		if (isNeighbours(inNode->coords, theNode->coords))
 		{
-			inNode->erase(theNode);
-			theNode->erase(inNode);
-			theNode->replaceThisByNode(theNode, inNode);
-			inNode->addNeighbours(theNode->neighbours);
+			/*if (inNode->neighbours.size() >= theNode->neighbours.size())
+			{*/
+				inNode->erase(theNode);
+				theNode->erase(inNode);
+				theNode->replaceThisByNode(theNode, inNode);
+				inNode->addNeighbours(theNode->neighbours);
+			/*}
+			else
+			{
+				theNode->erase(inNode);
+				inNode->erase(theNode);
+				inNode->replaceThisByNode(inNode, theNode);
+				theNode->addNeighbours(inNode->neighbours);
+
+			}*/
 			--i;
 		}
 	}
@@ -177,7 +189,7 @@ void turnsRecursive(Node* inNode, int& outLeftTurns, int& outRightTurns, bool** 
 
 		for (auto theTurnEnd : theTurnCenterNeighbours)
 		{
-			if (theTurnEnd == theTurnCenter)
+			if (theTurnEnd == theTurnBegin )
 				continue;
 
 
@@ -220,7 +232,7 @@ void turns(Node* inNode, int inNodesCount, int& outLeftTurns, int& outRightTurns
 		memset(theEdges[i], 0, sizeof(bool)* inNodesCount);
 	}
 
-	turnsRecursive(inNode, outRightTurns, outLeftTurns, theEdges);
+	turnsRecursive(inNode, outLeftTurns, outRightTurns, theEdges);
 
 	for (int i = 0; i < inNodesCount; i++)
 	{
