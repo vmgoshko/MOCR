@@ -61,6 +61,11 @@ struct Node
 	}
 };
 
+static float distance(cv::Point2f* a, cv::Point2f* b)
+{
+	return cv::norm(*a - *b);
+}
+
 void deepDraw(Node* inNode, cv::Mat& outImg)
 {
 	inNode->drawed = true;
@@ -210,7 +215,8 @@ void turnsRecursive(Node* inNode, int& outLeftTurns, int& outRightTurns, bool** 
 			float y3 = theTurnEnd->coords->y;
 
 			float D = (x3 - x1) * (y2 - y1) - (y3 - y1) * (x2 - x1);
-
+			float theTurnLength = distance(theTurnBegin->coords, theTurnCenter->coords);
+			theTurnLength += distance(theTurnCenter->coords, theTurnEnd->coords);
 			if (D < 0)
 				++outLeftTurns;
 			else
@@ -240,11 +246,6 @@ void turns(Node* inNode, int inNodesCount, int& outLeftTurns, int& outRightTurns
 	}
 
 	delete[] theEdges;
-}
-
-static float distance(cv::Point2f* a, cv::Point2f* b)
-{
-	return cv::norm(*a-*b);
 }
 
 static void fullLengthRecursive(Node* inNode, float& outLength, bool** inEdges)

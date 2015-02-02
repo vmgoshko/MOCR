@@ -174,6 +174,7 @@ void NeuralNetworkTools::createNetwork()
 {
 	Mat layers(1, 3, CV_32S);
 	layers.at<int>(0, 0) = mObjects[0]->size();
+	//layers.at<int>(0, 1) = 10 * mObjects.size();
 	layers.at<int>(0, 1) = mObjects.size();
 	layers.at<int>(0, 2) = mOutputStrings->size();
 

@@ -542,10 +542,13 @@ std::vector< Line* > SkeletonBuilder::findLines(cv::Mat& inSkeleton, float inObj
 			}
 			else
 			{
-				theLine.push_back(theNeighbour);
+				if (theLine[0] != theNeighbour)
+				{
+					theLine.push_back(theNeighbour);
 	
-				Line* theNewLine = newLine(theLine, x, y);
-				theResult.push_back(theNewLine);
+					Line* theNewLine = newLine(theLine, x, y);
+					theResult.push_back(theNewLine);
+				}
 			}
 		}
 
@@ -724,17 +727,14 @@ std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& 
 
 	findWidthHeigth(theRoot, mNodesCount, theWidth, theHeight);
 
-	theCharacteristics[0] /= theHeight;
-	theCharacteristics[1] /= theWidth;
-	
-	/*// —редн€€ длина отрезка
-	theCharacteristics[6] = theLength / theSectionsCount;
-	theCharacteristics[6] /= theHeight * theWidth;
-	*/
 	int theLeftTurns = 0;
 	int theRightTurns = 0;
 	turns(theRoot, mNodesCount, theLeftTurns, theRightTurns);
 	theCharacteristics[6] = theLeftTurns;
 	theCharacteristics[7] = theRightTurns;
+
+	theCharacteristics[0] /= theHeight;
+	theCharacteristics[1] /= theWidth;
+	
 	return theCharacteristics;
 }
