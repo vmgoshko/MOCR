@@ -43,6 +43,10 @@ void main()
 
 	neuralNetTools.setOutput(getOutsVector());
 	auto chars = getOutsVector();
+	int theIterationsCount = cFontsCount * chars->size();
+	int theIterationsComplete = 0;
+
+	std::cout << "Adding training examples started..." << std::endl;
 	for (int i = 0; i < cFontsCount; i++)
 	{
 		for (int j = 0; j < chars->size(); j++)
@@ -56,15 +60,22 @@ void main()
 			for (auto theObject : theBlackObjects)
 				neuralNetTools.addObject(theObject, j);
 
-			if (theBlackObjects.size() == 0)
-				int a = 0;
-
+			//if ( theIterationsComplete % 5 == 0)
+				std::cout << int(theIterationsComplete / (float)theIterationsCount * 100) << "% complete." << std::endl;
 			preProcessor.reset();
+
+			theIterationsComplete++;
 		}
 	}
 
+	std::cout << "Adding training examples finished..." << std::endl;
+	std::cout << "Training started..." << std::endl;
 	neuralNetTools.performTraining();
+	std::cout << "Training finished..." << std::endl;
+	std::cout << "Saving neural network file started..." << std::endl;
 	neuralNetTools.save(cNeuralNetworkSavePath);
+	std::cout << "Saving neural network file finished..." << std::endl;
+	std::cout << "Training fininshed." << std::endl;
 
 	system("pause");
 }
