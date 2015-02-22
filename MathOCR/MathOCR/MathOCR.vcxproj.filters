@@ -56,20 +56,11 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ImageView.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="ImageView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_RecognitionResultPane.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_ListItem.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_RecognitionResultPane.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_ListItem.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="RecognitionResultPane.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="qcustomplot.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_qcustomplot.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -77,13 +68,22 @@
     <ClCompile Include="GeneratedFiles\Release\moc_qcustomplot.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ListItem.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_RecognitionResultPane.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ListItem.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_RecognitionResultPane.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="ImageView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ListItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qcustomplot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RecognitionResultPane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -100,17 +100,17 @@
     <CustomBuild Include="ImageView.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="RecognitionResultPane.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="RecognitionResultPane.h">
+    <CustomBuild Include="ListItem.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="qcustomplot.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="ListItem.h">
+    <CustomBuild Include="RecognitionResultPane.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RecognitionResultPane.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -120,14 +120,25 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_RecognitionResultPane.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="SettingsKeys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_RecognitionResultPane.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\images\OCR_action_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\images\Recognize.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MathOCR.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

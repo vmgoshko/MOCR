@@ -21,3 +21,9 @@ libmocr/NeuralNetworkTrainer/nn
 libmocr/packages
 libmocr/traindata
 libmocr/Test/templates
+*.ipch
+*.lastbuildstate
+*.unsuccessfulbuild
+*.cache
+*.pch
+MathOCR/MathOCR/GeneratedFiles/qrc_mathocr.cpp
