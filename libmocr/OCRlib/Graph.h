@@ -79,7 +79,7 @@ void deepDraw(Node* inNode, cv::Mat& outImg)
 		end.x = theNode->coords->y;
 		end.y = theNode->coords->x;
 
-		line(outImg, start, end, cv::Scalar(255, 0, 0), 1);
+		line(outImg, start, end, cv::Scalar(255, 255, 255), 1);
 		line(outImg, end, end, cv::Scalar(255, 255, 255), 1);
 
 		if (!theNode->drawed)
@@ -196,7 +196,6 @@ void turnsRecursive(Node* inNode, int& outLeftTurns, int& outRightTurns, bool** 
 		{
 			if (theTurnEnd == theTurnBegin )
 				continue;
-
 
 			/*if (!theEdges[theTurnEnd->id][theTurnCenter->id] && !theEdges[theTurnCenter->id][theTurnEnd->id])
 			{

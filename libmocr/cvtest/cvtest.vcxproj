@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="10.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\OpenCV.2.4.9\build\native\OpenCV.props" Condition="Exists('..\packages\OpenCV.2.4.9\build\native\OpenCV.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -67,8 +68,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <IncludePath>..\OCRlib;D:\tesseract\include;D:\opencv\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Debug;D:\tesseract\lib;D:\opencv\opencv\build\x86\vc10\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>..\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>D:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
@@ -78,12 +79,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>D:\opencv\opencv\sources\include;C:\Program Files %28x86%29\Tesseract-OCR\tesseract-ocr;C:\Program Files %28x86%29\Tesseract-OCR\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\OCRlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OCRlib.lib;opencv_calib3d246d.lib;opencv_contrib246d.lib;opencv_core246d.lib;opencv_features2d246.lib;opencv_flann246.lib;opencv_gpu246d.lib;opencv_highgui246d.lib;opencv_imgproc246d.lib;opencv_legacy246d.lib;opencv_ml246d.lib;opencv_nonfree246d.lib;opencv_objdetect246.lib;opencv_photo246d.lib;opencv_stitching246d.lib;opencv_ts246d.lib;opencv_video246d.lib;opencv_videostab246d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OCRlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -132,7 +134,11 @@
       <Project>{b87d2591-5ea1-4613-99d9-e13a66e8c0a8}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\OpenCV.2.4.9\build\native\OpenCV.targets" Condition="Exists('..\packages\OpenCV.2.4.9\build\native\OpenCV.targets')" />
   </ImportGroup>
 </Project>

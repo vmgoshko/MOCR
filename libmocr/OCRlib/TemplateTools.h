@@ -37,7 +37,7 @@ public:
 		
 		for (size_t i = 0; i < inPossibleStrings.size(); i++)
 		{
-			if (inPossibleStrings[i] != 0)
+			if (inPossibleStrings[i] != 0 || theMaxMatch == -1)
 			{
 				int theMatch = matchTemplate(mOutStrings->at(i), inObject);
 				if (theMaxMatch < theMatch)

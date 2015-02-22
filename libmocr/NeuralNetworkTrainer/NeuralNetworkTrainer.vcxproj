@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="11.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\OpenCV.2.4.9\build\native\OpenCV.props" Condition="Exists('..\packages\OpenCV.2.4.9\build\native\OpenCV.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -39,8 +40,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>../DEBUG;D:\OpenCV\opencv\build\x86\vc10\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>../OCRlib;D:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>../DEBUG;$(LibraryPath)</LibraryPath>
+    <IncludePath>../OCRlib;$(IncludePath)</IncludePath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -51,7 +52,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OCRlib.lib;opencv_calib3d246d.lib;opencv_contrib246d.lib;opencv_core246d.lib;opencv_features2d246d.lib;opencv_flann246.lib;opencv_gpu246d.lib;opencv_haartraining_engined.lib;opencv_highgui246d.lib;opencv_imgproc246d.lib;opencv_legacy246d.lib;opencv_ml246d.lib;opencv_nonfree246d.lib;opencv_objdetect246d.lib;opencv_photo246d.lib;opencv_stitching246d.lib;opencv_ts246d.lib;opencv_video246d.lib;opencv_videostab246d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OCRlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -70,7 +71,11 @@
   <ItemGroup>
     <ClCompile Include="trainmain.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\OpenCV.2.4.9\build\native\OpenCV.targets" Condition="Exists('..\packages\OpenCV.2.4.9\build\native\OpenCV.targets')" />
   </ImportGroup>
 </Project>

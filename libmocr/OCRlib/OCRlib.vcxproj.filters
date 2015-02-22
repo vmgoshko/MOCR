@@ -13,9 +13,16 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\LeafRecognizers">
+      <UniqueIdentifier>{3f98a89b-f86d-442b-9425-82157b80fd1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LeafRecognizers">
+      <UniqueIdentifier>{ddbd7fd3-0d0f-4f6a-a982-9f6473733755}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Defs.h">
@@ -33,15 +40,6 @@
     <ClInclude Include="ComponentsTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LeafRecognizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NeuralNetworkLeafRecognizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PatternLeafRecognizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Structurer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,13 +49,34 @@
     <ClInclude Include="NeuralNetworkTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TwoStepsLeafRecognizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TemplateTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PyRecognize.h">
+    <ClInclude Include="Graph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LeafRecognizer.h">
+      <Filter>Header Files\LeafRecognizers</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetworkLeafRecognizer.h">
+      <Filter>Header Files\LeafRecognizers</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternLeafRecognizer.h">
+      <Filter>Header Files\LeafRecognizers</Filter>
+    </ClInclude>
+    <ClInclude Include="TwoStepsLeafRecognizer.h">
+      <Filter>Header Files\LeafRecognizers</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonNeuralNetworkTools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternNeuralNetworkTools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ocr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Factories.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,19 +87,28 @@
     <ClCompile Include="ImagePreProccessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TesseractLeafRecognizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ComponentsTree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NeuralNetworkLeafRecognizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Filters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NeuralNetworkTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetworkLeafRecognizer.cpp">
+      <Filter>Source Files\LeafRecognizers</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonNeuralNetworkTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PatternNeuralNetworkTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TwoStepsLeafRecognizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

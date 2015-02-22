@@ -604,7 +604,7 @@ void SkeletonBuilder::thinningGuoHall(cv::Mat& im)
 7. Количество скелетных точек, связанных с соседними по главной диагонали, к общему количеству скелетных точек
 8. Количество скелетных точек, связанных с соседними по обратной диагонали, к общему количеству скелетных точек
 */
-std::vector< float > SkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor)
+std::vector< float > RasterSkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor)
 {
 	cv::Mat theSavedSkeleton = inSkeleton;
 	cv::Mat theBoundedSkeleton = bound(&inSkeleton, inObjectColor).object;
@@ -657,7 +657,7 @@ std::vector< float > SkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleto
 			// Количество скелетных точек, связанных с соседними по обратной диагонали, к общему количеству скелетных точек:
 			if (theTopRight == inObjectColor || theBottomLeft == inObjectColor)
 				theCharacteristics[7] += 1;
-
+				
 			if (neighboursCount(theBoundedSkeleton, inObjectColor, i, j) == 1)
 				theCharacteristics[8]++;
 
@@ -678,18 +678,18 @@ std::vector< float > SkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleto
 	theCharacteristics[7] /= theSkeletonPixelsCount;
 
 	for (int i = 0; i < theHeight; i++)
-	for (int j = 0; j < theWidth; j++)
-	{
-		uchar thePixel = theBoundedSkeleton.at< uchar >(i, j);
-
-		if (thePixel > 0)
+		for (int j = 0; j < theWidth; j++)
 		{
-			// Среднеквадратичное отклонение от центра тяжести отностиельно OX
-			theCharacteristics[2] += (j - theCharacteristics[0]) * (j - theCharacteristics[0]);
-			// Среднеквадратичное отклонение от центра тяжести отностиельно OY
-			theCharacteristics[3] += (i - theCharacteristics[1]) * (i - theCharacteristics[1]);
+			uchar thePixel = theBoundedSkeleton.at< uchar >(i, j);
+
+			if (thePixel > 0)
+			{
+				// Среднеквадратичное отклонение от центра тяжести отностиельно OX
+				theCharacteristics[2] += (j - theCharacteristics[0]) * (j - theCharacteristics[0]);
+				// Среднеквадратичное отклонение от центра тяжести отностиельно OY
+				theCharacteristics[3] += (i - theCharacteristics[1]) * (i - theCharacteristics[1]);
+			}
 		}
-	}
 
 	theCharacteristics[2] = sqrtf(theCharacteristics[2]);
 	theCharacteristics[2] /= theSkeletonPixelsCount;
@@ -705,7 +705,7 @@ std::vector< float > SkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleto
 	return theCharacteristics;
 }
 
-std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& inSkeleton, float inObjectColor)
+std::vector< float > VectorSkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor)
 {
 	cv::Mat theVectorImage;
 	int theSectionsCount = 0;
@@ -736,5 +736,44 @@ std::vector< float > SkeletonBuilder::calculateCharacteristicVectorize(cv::Mat& 
 	theCharacteristics[0] /= theHeight;
 	theCharacteristics[1] /= theWidth;
 	
+	return theCharacteristics;
+}
+
+void BGR2GRAY(cv::Mat& bgr, cv::Mat& gray)
+{
+	for (int i = 0; i < bgr.rows; i++)
+		for (int j = 0; j < bgr.cols; j++)
+		{
+			auto color = bgr.at<cv::Vec3i>(i, j);
+			if (color[0] == 255)
+				gray.at<uchar>(i, j) = 255;
+			else
+				gray.at<uchar>(i, j) = 0;
+		}
+}
+
+std::vector< float > CombinedSkeletonBuilder::calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor)
+{
+	cv::Mat theVectorImage;
+	int theSectionsCount = 0;
+	Node* theRoot = vectorize(inSkeleton, inObjectColor, theSectionsCount, theVectorImage);
+	cv::Mat theVectorSkeleton(theVectorImage.rows, theVectorImage.cols, CV_8UC1);
+	BGR2GRAY(theVectorImage, theVectorSkeleton);
+
+	SkeletonBuilder* theRasterSkeletonBuilder = new RasterSkeletonBuilder();
+
+	std::vector< float > theCharacteristics = theRasterSkeletonBuilder->calculateCharacteristic(theVectorSkeleton, inObjectColor);
+
+	float theCyclesCount = 0;
+	cyclesCount(theRoot, mNodesCount, theCyclesCount);
+	theCharacteristics.push_back(theCyclesCount);
+	
+	int theLeftTurns = 0;
+	int theRightTurns = 0;
+	turns(theRoot, mNodesCount, theLeftTurns, theRightTurns);
+	theCharacteristics.push_back( theLeftTurns );
+	theCharacteristics.push_back( theRightTurns );
+
+	delete theRasterSkeletonBuilder;
 	return theCharacteristics;
 }

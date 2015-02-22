@@ -5,36 +5,13 @@
 #include <fstream>
 #include <string>
 
-#include "ImagePreProccessor.h"
-#include "NeuralNetworkTools.h"
-#include "ComponentsTree.h"
-#include "NeuralNetworkLeafRecognizer.h"
-#include "TwoStepsLeafRecognizer.h"
-#include "Structurer.h"
-#include "SkeletonBuilder.h"
-#include "Utils.h"
+#include "ocr.h"
 
 using namespace std;
 
 namespace {
 	const char* cImagePath = "img/iwona_1.png";
 };
-
-std::string Recognize(const char* inImagePath)
-{
-	ImagePreProccessor thePreProcessor;
-	TwoStepsLeafRecognizer theRecognizer;
-	Structurer theStructurer;
-	ComponentsTree theTree;
-
-	cv::Mat theProcessedImage = thePreProcessor.process(inImagePath);
-	theTree.build(theProcessedImage);
-	std::vector< std::string > theLeafsStrs = theRecognizer.recognizeLeafs(&theTree);
-	std::string theResult = theStructurer.structure(theProcessedImage, theTree.getLeafs(), theLeafsStrs);
-
-	return theResult;
-	//return "";
-}
 
 void main()
 {	

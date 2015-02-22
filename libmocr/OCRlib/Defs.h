@@ -14,6 +14,46 @@ namespace Config
 	const int cMaxLineLength = 2 * cNeuralNetworkImageHeight;
 }
 
+enum NNToolsType
+{
+	Pattern = 0,
+	Skeleton
+};
+
+enum SkeletonType
+{
+	Raster = 0,
+	Vector,
+	Raster_Vector,
+	None
+};
+
+enum LeafRecognizerType
+{
+	TwoStepsRecognizer = 0,
+	NeuralNetworkRecognizer,
+};
+
+struct Configuration
+{
+	char neuralNetworkFile[256];
+	LeafRecognizerType leafRecognizerType = LeafRecognizerType::TwoStepsRecognizer;
+	NNToolsType nnToolsType = NNToolsType::Skeleton;
+	SkeletonType skeletonType = SkeletonType::Vector;
+
+	Configuration()
+	{
+		strcpy(neuralNetworkFile, "nn");
+	}
+	Configuration(const char file[], LeafRecognizerType lrt, NNToolsType nntt, SkeletonType st )
+	{
+		strcpy_s(neuralNetworkFile, file);
+		leafRecognizerType = lrt;
+		skeletonType = st;
+		nnToolsType = nntt;
+	}
+};
+
 struct Bound 
 {
 	int l,r,t,b;

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="11.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\OpenCV.2.4.9\build\native\OpenCV.props" Condition="Exists('..\packages\OpenCV.2.4.9\build\native\OpenCV.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -42,7 +43,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(OPENCV_HOME)\build\x86\vc10\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -51,7 +52,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OPENCV_HOME)\build\include;$(BOOST_HOME);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -77,18 +78,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComponentsTree.h" />
     <ClInclude Include="Defs.h" />
-    <ClInclude Include="PyRecognize.h" />
+    <ClInclude Include="Factories.h" />
     <ClInclude Include="Filters.h" />
+    <ClInclude Include="Graph.h" />
     <ClInclude Include="ImagePreProccessor.h" />
     <ClInclude Include="LeafRecognizer.h" />
     <ClInclude Include="NeuralNetworkLeafRecognizer.h" />
     <ClInclude Include="NeuralNetworkTools.h" />
+    <ClInclude Include="ocr.h" />
+    <ClInclude Include="PatternNeuralNetworkTools.h" />
     <ClInclude Include="SkeletonBuilder.h" />
+    <ClInclude Include="SkeletonNeuralNetworkTools.h" />
     <ClInclude Include="TemplateTools.h" />
     <ClInclude Include="PatternLeafRecognizer.h" />
     <ClInclude Include="Structurer.h" />
@@ -101,10 +107,14 @@
     <ClCompile Include="ImagePreProccessor.cpp" />
     <ClCompile Include="NeuralNetworkLeafRecognizer.cpp" />
     <ClCompile Include="NeuralNetworkTools.cpp" />
-    <ClCompile Include="TesseractLeafRecognizer.cpp" />
+    <ClCompile Include="PatternNeuralNetworkTools.cpp" />
+    <ClCompile Include="SkeletonBuilder.cpp" />
+    <ClCompile Include="SkeletonNeuralNetworkTools.cpp" />
+    <ClCompile Include="TwoStepsLeafRecognizer.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\OpenCV.2.4.9\build\native\OpenCV.targets" Condition="Exists('..\packages\OpenCV.2.4.9\build\native\OpenCV.targets')" />
   </ImportGroup>
 </Project>

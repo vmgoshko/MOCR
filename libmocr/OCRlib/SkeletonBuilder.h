@@ -63,10 +63,11 @@ class SkeletonBuilder
 public:
 	~SkeletonBuilder();
 	void thinningGuoHall(cv::Mat& im);
-	std::vector< float > calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor);
+	virtual std::vector< float > calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor) = 0;
 	std::vector< float > calculateCharacteristicVectorize(cv::Mat& inSkeleton, float inObjectColor);
+	std::vector< float > calculateCharacteristicCombined(cv::Mat& inSkeleton, float inObjectColor);
 
-private:
+protected:
 	void ThinSubiteration1(cv::Mat & pSrc, cv::Mat & pDst);
 	void ThinSubiteration2(cv::Mat & pSrc, cv::Mat & pDst);
 	void thinningIteration(cv::Mat& im, int iter);
@@ -90,11 +91,26 @@ private:
 	Node* vectorize(cv::Mat& inSkeleton, float inObjectColor, int& outSectionsCount, cv::Mat& outImg);
 	Line* newLine(std::vector< cv::Point2f* >& inLine, int& outNewX, int& outNewY);
 
-private:
+protected:
 	std::vector<std::vector<Node*>> mNodes;
 	std::vector<std::vector<cv::Point2f*>> mPoints;
 	std::queue< cv::Point2f* > mCrossPoints;
 	int mNodesCount = 0;
+};
+
+class RasterSkeletonBuilder : public SkeletonBuilder
+{
+	virtual std::vector< float > calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor) override;
+};
+
+class VectorSkeletonBuilder : public SkeletonBuilder
+{
+	virtual std::vector< float > calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor) override;
+};
+
+class CombinedSkeletonBuilder : public SkeletonBuilder
+{
+	virtual std::vector< float > calculateCharacteristic(cv::Mat& inSkeleton, float inObjectColor) override;
 };
 
 #endif //SKELETON_BUILDER_H

@@ -12,7 +12,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OCRlib", "OCRlib\OCRlib.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cvtest", "cvtest\cvtest.vcxproj", "{130154B0-6010-49F4-A495-FF8FA367F2F0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TemplateBuilder", "TemplateBuilder\TemplateBuilder.vcxproj", "{35E3A562-816C-4AB5-B535-9B03D3E639E9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrainDataCreator", "TrainDataCreator\TrainDataCreator.vcxproj", "{3B646A6D-9F38-4CBC-8D81-77DAE2C7D7CE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{E42741BD-ECDB-45B9-85E0-D49970EA5055}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,12 +44,18 @@ Global
 		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Release|Win32.Build.0 = Release|Win32
 		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Release|x64.ActiveCfg = Release|x64
 		{130154B0-6010-49F4-A495-FF8FA367F2F0}.Release|x64.Build.0 = Release|x64
-		{35E3A562-816C-4AB5-B535-9B03D3E639E9}.Debug|Win32.ActiveCfg = Debug|Win32
-		{35E3A562-816C-4AB5-B535-9B03D3E639E9}.Debug|Win32.Build.0 = Debug|Win32
-		{35E3A562-816C-4AB5-B535-9B03D3E639E9}.Debug|x64.ActiveCfg = Debug|Win32
-		{35E3A562-816C-4AB5-B535-9B03D3E639E9}.Release|Win32.ActiveCfg = Release|Win32
-		{35E3A562-816C-4AB5-B535-9B03D3E639E9}.Release|Win32.Build.0 = Release|Win32
-		{35E3A562-816C-4AB5-B535-9B03D3E639E9}.Release|x64.ActiveCfg = Release|Win32
+		{3B646A6D-9F38-4CBC-8D81-77DAE2C7D7CE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3B646A6D-9F38-4CBC-8D81-77DAE2C7D7CE}.Debug|Win32.Build.0 = Debug|Win32
+		{3B646A6D-9F38-4CBC-8D81-77DAE2C7D7CE}.Debug|x64.ActiveCfg = Debug|Win32
+		{3B646A6D-9F38-4CBC-8D81-77DAE2C7D7CE}.Release|Win32.ActiveCfg = Release|Win32
+		{3B646A6D-9F38-4CBC-8D81-77DAE2C7D7CE}.Release|Win32.Build.0 = Release|Win32
+		{3B646A6D-9F38-4CBC-8D81-77DAE2C7D7CE}.Release|x64.ActiveCfg = Release|Win32
+		{E42741BD-ECDB-45B9-85E0-D49970EA5055}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E42741BD-ECDB-45B9-85E0-D49970EA5055}.Debug|Win32.Build.0 = Debug|Win32
+		{E42741BD-ECDB-45B9-85E0-D49970EA5055}.Debug|x64.ActiveCfg = Debug|Win32
+		{E42741BD-ECDB-45B9-85E0-D49970EA5055}.Release|Win32.ActiveCfg = Release|Win32
+		{E42741BD-ECDB-45B9-85E0-D49970EA5055}.Release|Win32.Build.0 = Release|Win32
+		{E42741BD-ECDB-45B9-85E0-D49970EA5055}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

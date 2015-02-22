@@ -29,9 +29,9 @@ const string gFileNames[] = {
 								"modern.png",
 								"pxfonts.png",
 								"txfonts.png"
-							};
+							}; // 14
 
-const size_t gFileNamesCount = 3;
+const size_t gFileNamesCount = 14;
 
 namespace {
 	void showImage(const char* name, cv::Mat& img)
@@ -42,8 +42,8 @@ namespace {
 
 	void makeCorrectSize(cv::Mat* obj)
 	{
-		int addHeight = 2 * Config::cNeuralNetworkImageHeight - obj->rows;
-		int addWidth = 2 * Config::cNeuralNetworkImageHeight - obj->cols;
+		int addHeight = 90 - obj->rows;
+		int addWidth = 90 - obj->cols;
 
 		int t;
 		int b;
@@ -116,11 +116,13 @@ void main()
 
 			theSavePath += "/";
 			theSavePath += buff;
+			scaleToHeight(theBlackObjects[j].object, 50);
 			makeCorrectSize(&theBlackObjects[j].object);
 			imwrite(theSavePath, theBlackObjects[j].object);
 		}
 
 		preProcessor.reset();
 	}
+	system("pause");
 	cvWaitKey();
 }

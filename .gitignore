@@ -13,6 +13,11 @@ libmocr/Debug
 MathOCR/.idea
 MathOCR/__pycache__
 MathOCR/*.bmp
+MathOCR/Win32
+MathOCR/MathOCR
+MathOCR/packages
 libmocr/cvtest/nn
 libmocr/NeuralNetworkTrainer/nn
 libmocr/packages
+libmocr/traindata
+libmocr/Test/templates

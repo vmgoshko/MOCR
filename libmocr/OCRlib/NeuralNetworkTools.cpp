@@ -9,6 +9,8 @@
 using namespace std;
 using namespace cv;
 
+extern Configuration gConfiguration;
+
 NeuralNetworkTools::NeuralNetworkTools(void) 
 	: mcNetworkFile("nn")
 {
@@ -102,27 +104,6 @@ cv::Mat* drawH(cv::Mat& obj)
 	return res;
 }
 
-void NeuralNetworkTools::addObject( BlackObject& obj, int inIndex )
-{
-	SkeletonBuilder theSkeletonBuilder;
-	obj = bound(&obj.object, 0);
-	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
-	copyMakeBorder(obj.object, obj.object, 1, 1, 1, 1, BORDER_CONSTANT, 255);
-	
-	//create input
-	invert( obj.object );
-	theSkeletonBuilder.thinningGuoHall(obj.object);
-	obj = bound(&obj.object, 255);
-	//theSkeletonBuilder.calculateCharacteristic(obj.object, 255);
-	std::vector< float >* theCharacteristics = new std::vector< float >(theSkeletonBuilder.calculateCharacteristicVectorize(obj.object, 255));
-	mObjects.push_back( theCharacteristics );
-
-	//create output
-	vector<float>* out = new vector<float>( mOutputStrings->size( ), -1 );
-	out->at(inIndex) = 1;
-	mObjectOutputs.push_back(out);
-}
-
 void NeuralNetworkTools::setOutput( vector<char*>* outs )
 {
 	mOutputStrings = outs;
@@ -137,21 +118,8 @@ const char* NeuralNetworkTools::predict(BlackObject& obj)
 
 std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 {
-	SkeletonBuilder theSkeletonBuilder;
-
-	obj = bound(&obj.object, 0);
-	copyMakeBorder(obj.object, obj.object, 1, 1, 1, 1, BORDER_CONSTANT, 255);
-	scaleToHeight(obj.object, Config::cNeuralNetworkImageHeight);
-
-	invert(obj.object);
-	theSkeletonBuilder.thinningGuoHall(obj.object);
-	obj = bound(&obj.object, 255);
-	std::vector< float > theCharacteristics = theSkeletonBuilder.calculateCharacteristicVectorize(obj.object, 255);
-
-	Mat input(1, theCharacteristics.size(), CV_32F);
+	Mat input = createInput(obj);
 	Mat predictOutput = Mat::zeros(1, mOutputStrings->size(), CV_32F);
-
-	copy(theCharacteristics.begin(), theCharacteristics.end(), input.ptr<float>());
 
 	mNetwork.predict(input, predictOutput);
 
@@ -165,7 +133,9 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 	for_each(theResult.begin(), theResult.end(), LessAverageToNullFunctor(theAverage));
 
 	float theMaxValue = *max_element(theResult.begin(), theResult.end());
-	transform(theResult.begin(), theResult.end(), theResult.begin(), std::bind2nd(std::divides<float>(), theMaxValue));
+	
+	if ( theMaxValue )
+		transform(theResult.begin(), theResult.end(), theResult.begin(), std::bind2nd(std::divides<float>(), theMaxValue));
 
 	return theResult;
 }
@@ -192,7 +162,7 @@ void NeuralNetworkTools::createInputOutput(cv::Mat& inInput, cv::Mat& inOutput)
 
 bool NeuralNetworkTools::load()
 {
-	mNetwork.load(mcNetworkFile);
+	mNetwork.load(gConfiguration.neuralNetworkFile);
 	return true;
 }
 

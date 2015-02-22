@@ -21,7 +21,7 @@ public:
 private:
 	std::string recognizeLeaf( cv::Mat* leaf );
 private:
-	NeuralNetworkTools tools;
+	NeuralNetworkTools* tools;
 };
 
 #endif //LEAFRECOGNIZER_H

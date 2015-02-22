@@ -8,14 +8,22 @@
 //OCRlib includes
 #include "Utils.h"
 #include "ComponentsTree.h"
-#include "NeuralNetworkTools.h"
+#include "SkeletonNeuralNetworkTools.h"
+#include "PatternNeuralNetworkTools.h"
 #include "ImagePreProccessor.h"
+
+extern Configuration gConfiguration;
 
 NeuralNetworkLeafRecognizer::NeuralNetworkLeafRecognizer()
 {
+	if (gConfiguration.nnToolsType == NNToolsType::Skeleton)
+		tools = new SkeletonNeuralNetworkTools();
+	else if (gConfiguration.nnToolsType == NNToolsType::Pattern)
+		tools = new PatternNeuralNetworkTools();
+
 	// Custom neural network prediction
-	tools.setOutput( getOutsVector() );
-	tools.load();
+	tools->setOutput( getOutsVector() );
+	tools->load();
 }
 
 std::vector<std::string> NeuralNetworkLeafRecognizer::recognizeLeafs(ComponentsTree* tree, std::vector< std::vector< float > >* inPosibilities)
@@ -39,6 +47,6 @@ std::string NeuralNetworkLeafRecognizer::recognizeLeaf( cv::Mat* leaf )
 	BlackObject theObject;
 	theObject.object = *leaf;
 
-	const char* theCharacter = tools.predict(theObject);
+	const char* theCharacter = tools->predict(theObject);
 	return std::string(theCharacter);
 }
