@@ -15,7 +15,7 @@ void main()
 		{ "../nn_skeleton_vector", LeafRecognizerType::TwoStepsRecognizer, NNToolsType::Skeleton, SkeletonType::Vector },
 		{ "../nn_skeleton_raster_vector", LeafRecognizerType::TwoStepsRecognizer, NNToolsType::Skeleton, SkeletonType::Raster_Vector },
 		
-	//	{ "../nn_pattern", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Pattern, SkeletonType::None },
+		{ "../nn_pattern", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Pattern, SkeletonType::None },
 		{ "../nn_skeleton_raster", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Skeleton, SkeletonType::Raster },
 		{ "../nn_skeleton_vector", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Skeleton, SkeletonType::Vector },
 		{ "../nn_skeleton_raster_vector", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Skeleton, SkeletonType::Raster_Vector }

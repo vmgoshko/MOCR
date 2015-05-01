@@ -86,9 +86,9 @@ void main()
 	Configuration configurations[] =
 	{
 		//{ "../nn_pattern", LeafRecognizerType::TwoStepsRecognizer, NNToolsType::Pattern, SkeletonType::None },
-		{ "../nn_skeleton_raster", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Skeleton, SkeletonType::Raster },
+		//{ "../nn_skeleton_raster", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Skeleton, SkeletonType::Raster },
 		{ "../nn_skeleton_vector", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Skeleton, SkeletonType::Vector },
-		{ "../nn_skeleton_raster_vector", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Skeleton, SkeletonType::Raster_Vector },
+		//{ "../nn_skeleton_raster_vector", LeafRecognizerType::NeuralNetworkRecognizer, NNToolsType::Skeleton, SkeletonType::Raster_Vector },
 	};
 
 	for (auto config : configurations)
