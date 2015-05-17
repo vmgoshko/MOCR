@@ -12,7 +12,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3B646A6D-9F38-4CBC-8D81-77DAE2C7D7CE}</ProjectGuid>
+    <ProjectGuid>{6E6F328D-070B-4E60-9608-D645C339326C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TrainDataCreator</RootNamespace>
   </PropertyGroup>

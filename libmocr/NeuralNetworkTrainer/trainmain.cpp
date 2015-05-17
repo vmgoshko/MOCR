@@ -16,7 +16,7 @@ namespace {
 	const char* cTrainDataFilePath = "img/iwona_traindata_fixed.png";
 	const char* cNeuralNetworkSavePath = "../cvtest/nn";
 	const char* cDataSetBasePath = "../traindata";
-	const int cFontsCount = 1;
+	const int cFontsCount = 5;
 }
 
 std::string makePath(std::string inChar, int inID)

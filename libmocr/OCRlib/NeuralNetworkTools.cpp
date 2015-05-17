@@ -58,11 +58,19 @@ void NeuralNetworkTools::performTraining()
 	
 	fillCriteriaAndParamsEps(criteria, params);
 
+	std::vector<size_t> index;
+
 	for (size_t i = 0; i < mObjects.size(); i++)
-		std::copy(mObjects[i]->begin(), mObjects[i]->end(), inputs.ptr<float>(i));
+		index.push_back(i);
+
+	std::random_shuffle(index.begin(), index.end());
+	std::random_shuffle(index.begin(), index.end());
+
+	for (size_t i = 0; i < mObjects.size(); i++)
+		std::copy(mObjects[index[i]]->begin(), mObjects[index[i]]->end(), inputs.ptr<float>(i));
 
 	for (size_t i = 0; i < mObjectOutputs.size(); i++)
-		std::copy(mObjectOutputs[i]->begin(), mObjectOutputs[i]->end(), outputs.ptr<float>(i));
+		std::copy(mObjectOutputs[index[i]]->begin(), mObjectOutputs[index[i]]->end(), outputs.ptr<float>(i));
 
 	createNetwork();
 	int theIterations = mNetwork.train(inputs, outputs, cv::Mat(), cv::Mat(), params);
@@ -142,15 +150,15 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 
 void NeuralNetworkTools::createNetwork()
 {
-	Mat layers(1, 5, CV_32S);
+	Mat layers(1, 3, CV_32S);
 	layers.at<int>(0, 0) = mObjects[0]->size();
-	layers.at<int>(0, 1) = 1 * mObjects.size();
-	layers.at<int>(0, 2) = 1 * mObjects.size();
-	layers.at<int>(0, 3) = mObjects.size();
-	layers.at<int>(0, 4) = mOutputStrings->size();
+	layers.at<int>(0, 1) = 2 * mObjects[0]->size();
+	//layers.at<int>(0, 2) = mOutputStrings->size();
+	layers.at<int>(0, 2) = mOutputStrings->size();
 
 	mNetwork.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1);
 }
+
 
 void NeuralNetworkTools::createInputOutput(cv::Mat& inInput, cv::Mat& inOutput)
 {

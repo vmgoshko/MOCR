@@ -18,11 +18,19 @@ namespace {
 
 Mat vectorToMat(vector< vector< int > >& v)
 {
+	int maxItem = -1;
+	for (int i = 0; i < v.size(); i++)
+	for (int j = 0; j < v[0].size(); j++)
+	if (abs(v[i][j]) > maxItem)
+		maxItem = v[i][j];
+
 	Mat theResult(v[0].size(), v.size(), CV_8UC1);
 	theResult.setTo(1);
 	for (int i = 0; i < v.size(); i++)
-		for (int j = 0; j < v[0].size(); j++)
-			theResult.at< uchar >(j, i) = v[i][j];
+	for (int j = 0; j < v[0].size(); j++)
+	{
+		theResult.at< uchar >(j, i) = (abs(v[i][j]) / (float)maxItem )* 255;
+	}
 
 	return theResult;
 }
@@ -34,6 +42,7 @@ struct Template
 	vector< vector< int > > weights;
 };
 
+Configuration gConfiguration;
 class TemplateBuilder
 {
 public:
@@ -55,6 +64,8 @@ public:
 			for (int j = 0; j < theTemplate.height; j++)
 				theWeights[i][j] = weight(theObj.object, j, i);
 			
+		auto res = vectorToMat(theWeights);
+	
 		string theFileName = cBaseSavePath;
 		if ( strcmp( name , "/" ) != 0 )
 			theFileName += name;
