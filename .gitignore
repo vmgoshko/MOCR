@@ -1,6 +1,5 @@
 *.sdf
 *.suo
-*.vcxproj
 *.log
 *.tlog
 *.obj
@@ -20,7 +19,6 @@ libmocr/cvtest/nn
 libmocr/NeuralNetworkTrainer/nn
 libmocr/packages
 libmocr/traindata
-libmocr/Test/templates
 *.ipch
 *.lastbuildstate
 *.unsuccessfulbuild

@@ -142,11 +142,12 @@ std::vector< float > NeuralNetworkTools::getPossibleChars(BlackObject& obj)
 
 void NeuralNetworkTools::createNetwork()
 {
-	Mat layers(1, 3, CV_32S);
+	Mat layers(1, 5, CV_32S);
 	layers.at<int>(0, 0) = mObjects[0]->size();
-	//layers.at<int>(0, 1) = 10 * mObjects.size();
-	layers.at<int>(0, 1) = mObjects.size();
-	layers.at<int>(0, 2) = mOutputStrings->size();
+	layers.at<int>(0, 1) = 1 * mObjects.size();
+	layers.at<int>(0, 2) = 1 * mObjects.size();
+	layers.at<int>(0, 3) = mObjects.size();
+	layers.at<int>(0, 4) = mOutputStrings->size();
 
 	mNetwork.create(layers, CvANN_MLP::SIGMOID_SYM, 1, 1);
 }
