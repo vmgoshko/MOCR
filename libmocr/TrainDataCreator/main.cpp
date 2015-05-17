@@ -31,7 +31,8 @@ const string gFileNames[] = {
 								"txfonts.png"
 							}; // 14
 
-const size_t gFileNamesCount = 14;
+const size_t gFileNamesCount = 5;
+const size_t dim = 90;
 
 namespace {
 	void showImage(const char* name, cv::Mat& img)
@@ -42,9 +43,11 @@ namespace {
 
 	void makeCorrectSize(cv::Mat* obj)
 	{
-		int addHeight = 90 - obj->rows;
-		int addWidth = 90 - obj->cols;
+		int addHeight = dim - obj->rows;
+		int addWidth = dim - obj->cols;
 
+		if (addWidth < 0)
+			int a = 0;
 		int t;
 		int b;
 		int l;
@@ -78,7 +81,10 @@ void main()
 	for (int i = 0; i < outChars->size(); i++)
 	{
 		string theSavePath = gOutFolder;
-
+		/*
+		stringstream str;
+		str << i;
+		theSavePath += str.str();*/
 		if (strcmp(outChars->at(i), "/") == 0)
 			theSavePath += "slash";
 		else if (strcmp(outChars->at(i), "*") == 0)
@@ -101,7 +107,10 @@ void main()
 		{
 			cv::Mat obj = theBlackObjects[j].object;
 			string theSavePath = gOutFolder;
-		
+
+			/*stringstream str;
+			str << j;
+			theSavePath += str.str();*/
 			if (strcmp(outChars->at(j), "/") == 0)
 				theSavePath += "slash";
 			else if (strcmp(outChars->at(j), "*") == 0)
@@ -116,7 +125,7 @@ void main()
 
 			theSavePath += "/";
 			theSavePath += buff;
-			scaleToHeight(theBlackObjects[j].object, 50);
+			scaleToHeight(theBlackObjects[j].object, dim - 40);
 			makeCorrectSize(&theBlackObjects[j].object);
 			imwrite(theSavePath, theBlackObjects[j].object);
 		}
